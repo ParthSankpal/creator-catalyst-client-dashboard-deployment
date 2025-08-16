@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.7",
+    "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.8.2",
     "autoprefixer": "^10.4.21",
+    "axios": "^1.11.0",
+    "googleapis": "^156.0.0",
+    "js-cookie": "^3.0.5",
     "next": "15.4.6",
+    "next-auth": "^4.24.11",
     "postcss": "^8.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",

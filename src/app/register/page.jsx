@@ -1,5 +1,5 @@
 'use client';
-import { registerUser } from "@/apiManager/api/userApi";
+import { registerUser } from "@/app/api/userApi";
 import { registerFailure, registerStart } from "@/store/slices/userSlice";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

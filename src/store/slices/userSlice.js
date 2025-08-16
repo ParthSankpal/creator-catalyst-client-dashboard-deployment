@@ -1,31 +1,25 @@
-
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  loading: false,
-  error: null,
-  user: null, // store registered user data here
+  status: 'idle', // 'idle' | 'loading' | 'authenticated' | 'unauthenticated'
+  user: null,
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
-    registerStart(state) {
-      state.loading = true;
-      state.error = null;
-    },
-    registerSuccess(state, action) {
-      state.loading = false;
+    setLoading: (state) => { state.status = 'loading'; },
+    setUser: (state, action) => {
       state.user = action.payload;
-      state.error = null;
+      state.status = action.payload ? 'authenticated' : 'unauthenticated';
     },
-    registerFailure(state, action) {
-      state.loading = false;
-      state.error = action.payload;
-    },
-  },
+    clearUser: (state) => {
+      state.user = null;
+      state.status = 'unauthenticated';
+    }
+  }
 });
 
-export const { registerStart, registerSuccess, registerFailure } = userSlice.actions;
+export const { setLoading, setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;
