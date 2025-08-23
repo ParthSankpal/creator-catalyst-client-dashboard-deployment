@@ -1,12 +1,12 @@
 "use client";
 
-import InitialStateManager from "@/components/InitialStateManager/InitialStateManager";
+
 
 
 const MainSection = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
-      <InitialStateManager />
+     
       {/* Navbar */}
       <header className="p-4 shadow bg-white">My Navbar</header>
 

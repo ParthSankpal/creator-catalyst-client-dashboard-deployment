@@ -3,8 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser, startGoogle } from '@/api/authApi';
-import { setLoading, setUser } from '@/store/slices/userSlice';
+import { getUser, startGoogle } from '../../api/authApi';
+import { setLoading, setUser } from '../../store/slices/userSlice';
 
 export default function LoginPage() {
   const router = useRouter();

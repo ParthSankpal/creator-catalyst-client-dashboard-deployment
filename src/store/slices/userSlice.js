@@ -1,24 +1,31 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  status: 'idle', // 'idle' | 'loading' | 'authenticated' | 'unauthenticated'
+  status: "idle", // 'idle' | 'loading' | 'authenticated' | 'unauthenticated'
   user: null,
+  token: null, // store JWT here
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
-    setLoading: (state) => { state.status = 'loading'; },
+    setLoading: (state) => {
+      state.status = "loading";
+    },
     setUser: (state, action) => {
-      state.user = action.payload;
-      state.status = action.payload ? 'authenticated' : 'unauthenticated';
+      state.user = action.payload.user;
+      if (action.payload.token) {
+        state.token = action.payload.token;
+      }
+      state.status = "authenticated";
     },
     clearUser: (state) => {
       state.user = null;
-      state.status = 'unauthenticated';
-    }
-  }
+      state.token = null;
+      state.status = "unauthenticated";
+    },
+  },
 });
 
 export const { setLoading, setUser, clearUser } = userSlice.actions;

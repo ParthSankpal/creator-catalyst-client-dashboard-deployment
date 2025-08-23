@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Creator Catalyst • Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+        .progress-bar { background: linear-gradient(90deg, #10b981 0%, #34d399 100%); }
+        .badge-locked { filter: grayscale(100%) opacity(0.4); }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notification-slide { animation: slideInRight 0.3s ease-in-out; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .card-hover { transition: all 0.2s ease-in-out; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); }
+        .sidebar { position: fixed; left: 0; top: 64px; height: calc(100vh - 64px); width: 256px; z-index: 20; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 fixed w-full top-0 z-30">
+        <div class="flex justify-between items-center h-16 px-4">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-white text-sm">CC</div>
+                <div>
+                    <h1 class="text-lg font-semibold text-gray-900">Creator Catalyst</h1>
+                    <p class="text-xs text-gray-500">Google × PING Network</p>
+                </div>
+            </div>
+            
+            <!-- Notifications & Profile -->
+            <div class="flex items-center gap-4">
+                <!-- Notifications Bell -->
+                <button id="notifications-btn" onclick="toggleNotifications()" class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-3.5-3.5A8.97 8.97 0 0118 9a9 9 0 10-9 9c1.25 0 2.45-.26 3.53-.73L17 15z"></path>
+                    </svg>
+                    <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center pulse">4</span>
+                </button>
+                
+                <!-- Profile -->
+                <div class="flex items-center gap-2">
+                    <div class="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <span class="text-sm font-semibold text-emerald-700">P</span>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Priya</span>
+                </div>
+                
+                <!-- Logout -->
+                <a href="creator-login.html" class="text-sm text-gray-600 hover:text-gray-900 px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="fixed top-16 right-4 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-40 transform translate-x-full transition-transform duration-300 max-h-96 overflow-y-auto">
+        <div class="p-4 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+                <button onclick="markAllAsRead()" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Mark all read</button>
+            </div>
+        </div>
+        
+        <div id="notifications-list" class="divide-y divide-gray-100">
+            <!-- Approved Notification -->
+            <div class="notification-item p-4 hover:bg-gray-50 cursor-pointer" data-status="approved">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">Video Approved!</p>
+                        <p class="text-xs text-gray-600">"Delhi Street Food Adventures" has been approved and published</p>
+                        <p class="text-xs text-gray-500 mt-1">+50 points earned • 2 hours ago</p>
+                    </div>
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Pending Notification -->
+            <div class="notification-item p-4 hover:bg-gray-50 cursor-pointer" data-status="pending">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">Under Review</p>
+                        <p class="text-xs text-gray-600">"Connaught Place Evening Walk" is being reviewed by our team</p>
+                        <p class="text-xs text-gray-500 mt-1">Expected approval within 24 hours • 1 day ago</p>
+                    </div>
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Rejected Notification -->
+            <div class="notification-item p-4 hover:bg-gray-50 cursor-pointer" data-status="rejected" onclick="showRejectionDetails()">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">Video Rejected</p>
+                        <p class="text-xs text-gray-600">"Random City Video" needs improvements</p>
+                        <p class="text-xs text-gray-500 mt-1">Click to see feedback • 2 days ago</p>
+                    </div>
+                    <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Challenge Complete Notification -->
+            <div class="notification-item p-4 hover:bg-gray-50 cursor-pointer" data-status="completed">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">Challenge Completed!</p>
+                        <p class="text-xs text-gray-600">Successfully completed "Mumbai Heritage Sites" challenge</p>
+                        <p class="text-xs text-gray-500 mt-1">Ranked #7 out of 156 participants • 3 days ago</p>
+                    </div>
+                    <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-100 text-center">
+            <button onclick="showAllNotifications()" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">View All Notifications</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white shadow-lg border-r border-gray-200 overflow-y-auto z-20">
+        <nav class="p-4 space-y-2">
+            <a href="#" onclick="showPage('dashboard')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg bg-emerald-50 text-emerald-700 font-medium">
+                <span class="text-lg">🏠</span> Dashboard
+            </a>
+            <a href="#" onclick="showPage('submit')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">📤</span> Submit
+            </a>
+            <a href="#" onclick="showPage('challenges')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">🏆</span> Challenges
+            </a>
+            <a href="#" onclick="showPage('modules')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">📚</span> Modules
+            </a>
+            <a href="#" onclick="showPage('leaderboard')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">📊</span> Leaderboard
+            </a>
+            <a href="#" onclick="showPage('rewards')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">🎁</span> Rewards
+            </a>
+            <a href="#" onclick="showPage('rejected-videos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">🔍</span> Rejected Videos
+            </a>
+            <a href="#" onclick="showPage('settings')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                <span class="text-lg">⚙️</span> Settings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 pt-16 min-h-screen">
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page-content">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Hi, Priya from Delhi! 👋</h2>
+                    <p class="mt-1 text-gray-600">Ready to make your city discoverable? Let's create amazing content!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Progress Card -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Your Progress</h3>
+                                <span class="text-2xl">🎯</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <div class="text-2xl font-bold text-emerald-700">5</div>
+                                    <div class="text-sm text-gray-600">of 12 Shorts</div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                        <div class="progress-bar h-2 rounded-full" style="width: 42%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center p-4 bg-yellow-50 rounded-xl">
+                                    <div class="text-2xl font-bold text-yellow-700">260</div>
+                                    <div class="text-sm text-gray-600">Current Points</div>
+                                    <div class="text-xs text-yellow-600 mt-1">+45 this week</div>
+                                </div>
+                                
+                                <div class="text-center p-4 bg-purple-50 rounded-xl">
+                                    <div class="text-2xl font-bold text-purple-700">#18</div>
+                                    <div class="text-sm text-gray-600">in Delhi</div>
+                                    <div class="text-xs text-purple-600 mt-1">↑3 positions</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active Challenge -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Active Challenge</h3>
+                                <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">2 days left</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Delhi Street Food Spots</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Showcase hidden gems and popular street food locations in Delhi.</p>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 text-sm text-gray-500">
+                                    <span>📅 Deadline: Jan 20, 2025</span>
+                                    <span>•</span>
+                                    <span>🏆 50 points</span>
+                                </div>
+                                
+                                <button onclick="showPage('submit')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-xl font-semibold">
+                                    Submit Video 📹
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Current Module -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Current Module</h3>
+                                <span class="text-2xl">📚</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Week 3: Editing & Tools</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Master video editing techniques and essential tools for creating engaging short-form content.</p>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <button class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                        Watch Video 🎥
+                                    </button>
+                                    <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                        Download PDF 📄
+                                    </button>
+                                    <button class="bg-green-100 hover:bg-green-200 text-green-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                        Mark Complete ✓
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6">
+                        <!-- Quick Stats -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Views this week</span>
+                                    <span class="font-semibold text-gray-900">12.5K</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Likes received</span>
+                                    <span class="font-semibold text-gray-900">834</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Comments</span>
+                                    <span class="font-semibold text-gray-900">127</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Completion rate</span>
+                                    <span class="font-semibold text-green-600">85%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming</h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+                                    <div class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900">Challenge submission</div>
+                                        <div class="text-xs text-gray-500">Due in 2 days</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                                    <div class="w-2 h-2 bg-yellow-500 rounded-full flex-shrink-0"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900">Week 4 module</div>
+                                        <div class="text-xs text-gray-500">Starts Jan 22</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Badges -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Badges</h3>
+                                <span class="text-sm text-emerald-600 font-medium">3/8 unlocked</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="text-center p-3 bg-yellow-50 rounded-xl">
+                                    <div class="text-2xl mb-1">🏆</div>
+                                    <div class="text-xs font-medium text-gray-700">First Upload</div>
+                                </div>
+                                <div class="text-center p-3 bg-blue-50 rounded-xl">
+                                    <div class="text-2xl mb-1">🎬</div>
+                                    <div class="text-xs font-medium text-gray-700">Creator</div>
+                                </div>
+                                <div class="text-center p-3 bg-green-50 rounded-xl">
+                                    <div class="text-2xl mb-1">📈</div>
+                                    <div class="text-xs font-medium text-gray-700">Trending</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenges Page with Enhanced Cards -->
+        <div id="challenges-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Challenges 🏆</h2>
+                    <p class="mt-1 text-gray-600">Participate in exciting challenges to earn points and showcase your creativity!</p>
+                </div>
+
+                <!-- Enhanced Filter Tabs -->
+                <div class="mb-6">
+                    <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit">
+                        <button onclick="switchTab('active')" id="active-tab" class="px-6 py-3 text-sm font-medium rounded-lg tab-active transition-all">
+                            Active (3)
+                        </button>
+                        <button onclick="switchTab('completed')" id="completed-tab" class="px-6 py-3 text-sm font-medium rounded-lg tab-inactive transition-all">
+                            Completed (5)
+                        </button>
+                        <button onclick="switchTab('upcoming')" id="upcoming-tab" class="px-6 py-3 text-sm font-medium rounded-lg tab-inactive transition-all">
+                            Upcoming (2)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Challenges with Enhanced Cards -->
+                <div id="active-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Enhanced Active Challenge Card 1 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-red-500 card-hover relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-red-50 rounded-full -mr-10 -mt-10"></div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full animate-pulse">
+                                ⏰ 2 days left
+                            </span>
+                            <span class="text-3xl">🍕</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Delhi Street Food Spots</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Showcase the hidden gems and popular street food locations in Delhi. Focus on authenticity and local experience.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>👥</span> Participants
+                                </span>
+                                <span class="font-bold text-gray-900">847</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>🏆</span> Reward
+                                </span>
+                                <span class="font-bold text-emerald-600">50 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>📊</span> Difficulty
+                                </span>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">Medium</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white py-3 rounded-xl font-semibold transition-all transform hover:scale-105">
+                            Submit Entry 🚀
+                        </button>
+                    </div>
+
+                    <!-- Enhanced Active Challenge Card 2 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500 card-hover relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-yellow-50 rounded-full -mr-10 -mt-10"></div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">
+                                📅 5 days left
+                            </span>
+                            <span class="text-3xl">🏛️</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Historic Mumbai</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Explore and document Mumbai's rich history through its architecture, monuments, and cultural landmarks.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>👥</span> Participants
+                                </span>
+                                <span class="font-bold text-gray-900">623</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>🏆</span> Reward
+                                </span>
+                                <span class="font-bold text-emerald-600">75 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>📊</span> Difficulty
+                                </span>
+                                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Hard</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white py-3 rounded-xl font-semibold transition-all transform hover:scale-105">
+                            Submit Entry 🚀
+                        </button>
+                    </div>
+
+                    <!-- Enhanced Active Challenge Card 3 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500 card-hover relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -mr-10 -mt-10"></div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                📅 1 week left
+                            </span>
+                            <span class="text-3xl">💻</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Bangalore Tech Hub</h3>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Show the innovative spirit of Bangalore's tech ecosystem, from startups to IT parks and innovation centers.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>👥</span> Participants
+                                </span>
+                                <span class="font-bold text-gray-900">392</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>🏆</span> Reward
+                                </span>
+                                <span class="font-bold text-emerald-600">60 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 flex items-center gap-1">
+                                    <span>📊</span> Difficulty
+                                </span>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Easy</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-semibold transition-all transform hover:scale-105">
+                            Submit Entry 🚀
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Completed Challenges -->
+                <div id="completed-content" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Enhanced Completed Challenge Card -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 card-hover relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-full -mr-10 -mt-10"></div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">✓ COMPLETED</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                🏆 Completed
+                            </span>
+                            <span class="text-3xl">🎨</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Kolkata Art Scene</h3>
+                        <p class="text-sm text-gray-600 mb-4">Captured the vibrant art culture of Kolkata, from street art to traditional galleries.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Your Rank</span>
+                                <span class="font-bold text-green-600 bg-green-50 px-2 py-1 rounded">#7 out of 156</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Points Earned</span>
+                                <span class="font-bold text-green-600">45 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Completion Date</span>
+                                <span class="text-sm text-gray-700">Jan 15, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="bg-green-100 text-green-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                View Certificate 📜
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                Share Results 📤
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- More completed challenges... -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 card-hover relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-full -mr-10 -mt-10"></div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">✓ COMPLETED</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                🏆 Completed
+                            </span>
+                            <span class="text-3xl">🌊</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Chennai Beach Culture</h3>
+                        <p class="text-sm text-gray-600 mb-4">Explored Chennai's beautiful beaches and coastal lifestyle.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Your Rank</span>
+                                <span class="font-bold text-green-600 bg-green-50 px-2 py-1 rounded">#3 out of 89</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Points Earned</span>
+                                <span class="font-bold text-green-600">65 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Completion Date</span>
+                                <span class="text-sm text-gray-700">Jan 10, 2025</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="bg-green-100 text-green-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                View Certificate 📜
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium">
+                                Share Results 📤
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Upcoming Challenges -->
+                <div id="upcoming-content" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500 card-hover relative overflow-hidden opacity-90">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-purple-50 rounded-full -mr-10 -mt-10"></div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">COMING SOON</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">
+                                🗓️ Starts Feb 1
+                            </span>
+                            <span class="text-3xl">🎭</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Chennai Cultural Heritage</h3>
+                        <p class="text-sm text-gray-600 mb-4">Explore Chennai's rich cultural heritage, temples, music, and traditional arts.</p>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Expected Reward</span>
+                                <span class="font-bold text-purple-600">80 points</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Duration</span>
+                                <span class="font-bold text-gray-700">2 weeks</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Difficulty</span>
+                                <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Medium</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-semibold cursor-not-allowed">
+                            ⏳ Coming Soon
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejected Videos Search Page -->
+        <div id="rejected-videos-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Rejected Videos 🔍</h2>
+                    <p class="mt-1 text-gray-600">Review feedback and improve your content to get approved</p>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <div class="relative">
+                        <input type="text" id="search-rejected" placeholder="Search by video title, challenge name, or rejection reason..." 
+                               class="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:border-emerald-500 focus:ring-emerald-500">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Rejected Videos List -->
+                <div class="space-y-4">
+                    <!-- Rejected Video Item 1 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-red-500">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-24 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-lg flex items-center justify-center">
+                                    <span class="text-white text-2xl">📹</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-lg">Random City Video</h3>
+                                    <p class="text-sm text-gray-600">Challenge: Delhi Street Food Spots</p>
+                                    <p class="text-xs text-gray-500 mt-1">Submitted: Jan 16, 2025 • Rejected: Jan 17, 2025</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">REJECTED</span>
+                        </div>
+
+                        <!-- Rejection Reasons -->
+                        <div class="bg-red-50 rounded-xl p-4 mb-4">
+                            <h4 class="font-semibold text-red-800 mb-2 flex items-center gap-2">
+                                <span>❌</span> Rejection Reasons:
+                            </h4>
+                            <ul class="space-y-1 text-sm text-red-700">
+                                <li>• Content does not match the challenge theme (street food)</li>
+                                <li>• Poor video quality and lighting</li>
+                                <li>• Missing location information in Delhi</li>
+                                <li>• Duration too short (only 8 seconds, minimum 15 required)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Improvement Suggestions -->
+                        <div class="bg-emerald-50 rounded-xl p-4 mb-4">
+                            <h4 class="font-semibold text-emerald-800 mb-2 flex items-center gap-2">
+                                <span>💡</span> How to Improve:
+                            </h4>
+                            <ul class="space-y-1 text-sm text-emerald-700">
+                                <li>• Focus on actual street food vendors and dishes in Delhi</li>
+                                <li>• Ensure good lighting - shoot during daytime or use proper lighting</li>
+                                <li>• Include specific location names (e.g., Chandni Chowk, Connaught Place)</li>
+                                <li>• Make video at least 15-60 seconds long with engaging content</li>
+                                <li>• Add captions or voice-over explaining the food/location</li>
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3">
+                            <button onclick="resubmitVideo('random-city-video')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg font-medium">
+                                📤 Resubmit Improved Version
+                            </button>
+                            <button onclick="contactSupport('random-city-video')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium">
+                                💬 Contact Support
+                            </button>
+                            <button onclick="viewGuidelines()" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium">
+                                📋 View Guidelines
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Rejected Video Item 2 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-24 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center">
+                                    <span class="text-white text-2xl">📹</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-lg">Blurry Market Footage</h3>
+                                    <p class="text-sm text-gray-600">Challenge: Historic Mumbai</p>
+                                    <p class="text-xs text-gray-500 mt-1">Submitted: Jan 14, 2025 • Rejected: Jan 15, 2025</p>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">NEEDS REVISION</span>
+                        </div>
+
+                        <!-- Rejection Reasons -->
+                        <div class="bg-yellow-50 rounded-xl p-4 mb-4">
+                            <h4 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+                                <span>⚠️</span> Issues Found:
+                            </h4>
+                            <ul class="space-y-1 text-sm text-yellow-700">
+                                <li>• Video quality is too blurry/out of focus</li>
+                                <li>• Audio has excessive background noise</li>
+                                <li>• Content doesn't highlight historical significance</li>
+                            </ul>
+                        </div>
+
+                        <!-- Improvement Suggestions -->
+                        <div class="bg-emerald-50 rounded-xl p-4 mb-4">
+                            <h4 class="font-semibold text-emerald-800 mb-2 flex items-center gap-2">
+                                <span>🎯</span> Quick Fixes:
+                            </h4>
+                            <ul class="space-y-1 text-sm text-emerald-700">
+                                <li>• Use auto-focus or manually focus before recording</li>
+                                <li>• Record in a quieter area or use external mic</li>
+                                <li>• Add text overlay explaining historical context</li>
+                                <li>• Film specific historical elements (architecture, monuments)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3">
+                            <button onclick="resubmitVideo('blurry-market-footage')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg font-medium">
+                                📤 Resubmit Improved Version
+                            </button>
+                            <button onclick="watchTutorial('video-quality')" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium">
+                                🎥 Watch Tutorial
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="mt-8 bg-blue-50 rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        <span>📚</span> Need Help Improving Your Videos?
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="showPage('modules')" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium">
+                            📖 Learning Modules
+                        </button>
+                        <button onclick="viewGuidelines()" class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium">
+                            📋 Content Guidelines
+                        </button>
+                        <button onclick="contactSupport()" class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium">
+                            💬 Get Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Page -->
+        <div id="submit-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Submit Your Content 📤</h2>
+                    <p class="mt-1 text-gray-600">Submit your video URL to participate in challenges and earn points!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Upload Form -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Submit Video URL</h3>
+                            
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-emerald-400 mb-6">
+                                <div class="text-4xl mb-4">🔗</div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">Enter your video URL</h4>
+                                <p class="text-sm text-gray-600 mb-4">Paste the link to your video (YouTube, Instagram, TikTok, etc.)</p>
+                                <input type="url" id="video-url" placeholder="https://youtube.com/watch?v=..." 
+                                       class="w-full max-w-md mx-auto px-4 py-3 text-center rounded-lg border-2 border-gray-300 focus:border-emerald-500">
+                                <p class="text-xs text-gray-500 mt-3">Supported: YouTube, Instagram, TikTok, Vimeo</p>
+                            </div>
+
+                            <form id="submission-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Video Title</label>
+                                    <input type="text" id="video-title" placeholder="Give your video an engaging title..." 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea rows="3" id="video-description" placeholder="Describe what makes this content special..." 
+                                              class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Challenge</label>
+                                        <select id="video-challenge" class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                            <option value="">Select a challenge...</option>
+                                            <option value="delhi-street-food">Delhi Street Food Spots</option>
+                                            <option value="mumbai-history">Historic Mumbai</option>
+                                            <option value="bangalore-tech">Bangalore Tech Hub</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                        <input type="text" id="video-location" placeholder="Delhi, India" 
+                                               class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="terms" class="rounded border-gray-300 text-emerald-600">
+                                    <label for="terms" class="text-sm text-gray-600">I agree to the content guidelines and terms of service</label>
+                                </div>
+
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold">
+                                    Submit Video 🚀
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Submission Guidelines -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Submission Guidelines</h3>
+                            
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Video duration: 15-60 seconds</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Vertical format preferred (9:16 ratio)</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Clear audio and good lighting</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Original content only</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Must feature your city/location</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Submissions</h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                                    <div class="w-12 h-8 bg-gradient-to-br from-green-400 to-emerald-400 rounded"></div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Old Delhi Markets</div>
+                                        <div class="text-xs text-gray-500">Approved • 2 days ago</div>
+                                    </div>
+                                    <div class="text-green-600 text-sm">+50 pts</div>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                                    <div class="w-12 h-8 bg-gradient-to-br from-yellow-400 to-orange-400 rounded"></div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Connaught Place</div>
+                                        <div class="text-xs text-gray-500">Under Review • 1 day ago</div>
+                                    </div>
+                                    <div class="text-yellow-600 text-sm">Pending</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Page -->
+        <div id="submit-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Submit Your Content 📤</h2>
+                    <p class="mt-1 text-gray-600">Submit your video URL to participate in challenges and earn points!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Upload Form -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Submit Video URL</h3>
+                            
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-emerald-400 mb-6">
+                                <div class="text-4xl mb-4">🔗</div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">Enter your video URL</h4>
+                                <p class="text-sm text-gray-600 mb-4">Paste the link to your video (YouTube, Instagram, TikTok, etc.)</p>
+                                <input type="url" id="video-url" placeholder="https://youtube.com/watch?v=..." 
+                                       class="w-full max-w-md mx-auto px-4 py-3 text-center rounded-lg border-2 border-gray-300 focus:border-emerald-500">
+                                <p class="text-xs text-gray-500 mt-3">Supported: YouTube, Instagram, TikTok, Vimeo</p>
+                            </div>
+
+                            <form id="submission-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Video Title</label>
+                                    <input type="text" id="video-title" placeholder="Give your video an engaging title..." 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea rows="3" id="video-description" placeholder="Describe what makes this content special..." 
+                                              class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Challenge</label>
+                                        <select id="video-challenge" class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                            <option value="">Select a challenge...</option>
+                                            <option value="delhi-street-food">Delhi Street Food Spots</option>
+                                            <option value="mumbai-history">Historic Mumbai</option>
+                                            <option value="bangalore-tech">Bangalore Tech Hub</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                        <input type="text" id="video-location" placeholder="Delhi, India" 
+                                               class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 px-4 py-3">
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="terms" class="rounded border-gray-300 text-emerald-600">
+                                    <label for="terms" class="text-sm text-gray-600">I agree to the content guidelines and terms of service</label>
+                                </div>
+
+                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold">
+                                    Submit Video 🚀
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Submission Guidelines -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Submission Guidelines</h3>
+                            
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Video duration: 15-60 seconds</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Vertical format preferred (9:16 ratio)</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Clear audio and good lighting</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Original content only</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-emerald-500">✓</span>
+                                    <span class="text-gray-600">Must feature your city/location</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Submissions</h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                                    <div class="w-12 h-8 bg-gradient-to-br from-green-400 to-emerald-400 rounded"></div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Old Delhi Markets</div>
+                                        <div class="text-xs text-gray-500">Approved • 2 days ago</div>
+                                    </div>
+                                    <div class="text-green-600 text-sm">+50 pts</div>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                                    <div class="w-12 h-8 bg-gradient-to-br from-yellow-400 to-orange-400 rounded"></div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Connaught Place</div>
+                                        <div class="text-xs text-gray-500">Under Review • 1 day ago</div>
+                                    </div>
+                                    <div class="text-yellow-600 text-sm">Pending</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenges Page -->
+        <div id="challenges-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Challenges 🏆</h2>
+                    <p class="mt-1 text-gray-600">Participate in exciting challenges to earn points and showcase your creativity!</p>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="mb-6">
+                    <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit">
+                        <button onclick="switchTab('active')" id="active-tab" class="px-4 py-2 text-sm font-medium rounded-md bg-white text-gray-900 shadow-sm">Active</button>
+                        <button onclick="switchTab('completed')" id="completed-tab" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600">Completed</button>
+                        <button onclick="switchTab('upcoming')" id="upcoming-tab" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600">Upcoming</button>
+                    </div>
+                </div>
+
+                <!-- Active Challenges -->
+                <div id="active-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Challenge 1 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-red-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">2 days left</span>
+                            <span class="text-2xl">🍕</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Delhi Street Food Spots</h3>
+                        <p class="text-sm text-gray-600 mb-4">Showcase the hidden gems and popular street food locations in Delhi. Focus on authenticity and local experience.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Participants</span>
+                                <span class="font-medium">847</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Reward</span>
+                                <span class="font-medium text-emerald-600">50 points</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                            Submit Entry
+                        </button>
+                    </div>
+
+                    <!-- Challenge 2 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">5 days left</span>
+                            <span class="text-2xl">🏛️</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Historic Mumbai</h3>
+                        <p class="text-sm text-gray-600 mb-4">Explore and document Mumbai's rich history through its architecture, monuments, and cultural landmarks.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Participants</span>
+                                <span class="font-medium">623</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Reward</span>
+                                <span class="font-medium text-emerald-600">75 points</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                            Submit Entry
+                        </button>
+                    </div>
+
+                    <!-- Challenge 3 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">1 week left</span>
+                            <span class="text-2xl">💻</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Bangalore Tech Hub</h3>
+                        <p class="text-sm text-gray-600 mb-4">Show the innovative spirit of Bangalore's tech ecosystem, from startups to IT parks and innovation centers.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Participants</span>
+                                <span class="font-medium">392</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Reward</span>
+                                <span class="font-medium text-emerald-600">60 points</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="showPage('submit')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                            Submit Entry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Completed & Upcoming content -->
+                <div id="completed-content" class="hidden">
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No completed challenges yet</h3>
+                        <p class="text-gray-600">Complete your first challenge to see it here!</p>
+                    </div>
+                </div>
+
+                <div id="upcoming-content" class="hidden">
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">⏰</div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">More challenges coming soon</h3>
+                        <p class="text-gray-600">Stay tuned for exciting new challenges!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modules Page -->
+        <div id="modules-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Learning Modules 📚</h2>
+                    <p class="mt-1 text-gray-600">Master content creation through our structured 6-week bootcamp program!</p>
+                </div>
+
+                <!-- Progress Overview -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Your Progress</h3>
+                        <span class="text-sm text-emerald-600 font-medium">Week 3 of 6</span>
+                    </div>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                        <div class="bg-emerald-500 h-3 rounded-full" style="width: 50%"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-xl font-bold text-emerald-600">3/6</div>
+                            <div class="text-xs text-gray-500">Weeks Completed</div>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-blue-600">12/18</div>
+                            <div class="text-xs text-gray-500">Videos Watched</div>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-purple-600">8/12</div>
+                            <div class="text-xs text-gray-500">Assignments Done</div>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-orange-600">85%</div>
+                            <div class="text-xs text-gray-500">Overall Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modules Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Week 1 - Completed -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Completed</span>
+                            <span class="text-2xl">📱</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Week 1: Getting Started</h3>
+                        <p class="text-sm text-gray-600 mb-4">Learn the basics of mobile content creation and platform requirements.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Videos</span>
+                                <span class="text-green-600 font-medium">3/3 ✓</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Score</span>
+                                <span class="text-green-600 font-medium">92%</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-green-100 text-green-700 py-2 rounded-lg font-medium">
+                            Review Materials
+                        </button>
+                    </div>
+
+                    <!-- Week 2 - Completed -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Completed</span>
+                            <span class="text-2xl">🎭</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Week 2: Storytelling</h3>
+                        <p class="text-sm text-gray-600 mb-4">Master visual storytelling for short-form content.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Videos</span>
+                                <span class="text-green-600 font-medium">4/4 ✓</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Score</span>
+                                <span class="text-green-600 font-medium">88%</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-green-100 text-green-700 py-2 rounded-lg font-medium">
+                            Review Materials
+                        </button>
+                    </div>
+
+                    <!-- Week 3 - Current -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-emerald-500 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">In Progress</span>
+                            <span class="text-2xl">✂️</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Week 3: Editing & Tools</h3>
+                        <p class="text-sm text-gray-600 mb-4">Learn video editing techniques and essential tools.</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Videos</span>
+                                <span class="text-emerald-600 font-medium">2/3</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Progress</span>
+                                <span class="text-emerald-600 font-medium">75%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button class="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-medium">
+                                Watch Next Video 🎥
+                            </button>
+                            <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                                Mark Complete ✓
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Leaderboard 📊</h2>
+                    <p class="mt-1 text-gray-600">See how you rank against other creators in your city and across India!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Main Leaderboard -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Delhi Rankings</h3>
+                                <span class="text-sm text-gray-500">Updated hourly</span>
+                            </div>
+
+                            <!-- Top 3 Podium -->
+                            <div class="grid grid-cols-3 gap-4 mb-8">
+                                <!-- 2nd Place -->
+                                <div class="text-center order-1">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg">A</div>
+                                    <div class="text-sm font-medium text-gray-900">Arjun K.</div>
+                                    <div class="text-xs text-gray-500 mb-2">1,245 pts</div>
+                                    <div class="w-8 h-8 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
+                                        <span class="text-lg">🥈</span>
+                                    </div>
+                                </div>
+
+                                <!-- 1st Place -->
+                                <div class="text-center order-2">
+                                    <div class="w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-xl">R</div>
+                                    <div class="text-sm font-medium text-gray-900">Ravi M.</div>
+                                    <div class="text-xs text-gray-500 mb-2">1,432 pts</div>
+                                    <div class="w-10 h-10 bg-yellow-100 rounded-full mx-auto flex items-center justify-center">
+                                        <span class="text-xl">👑</span>
+                                    </div>
+                                </div>
+
+                                <!-- 3rd Place -->
+                                <div class="text-center order-3">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full mx-auto mb-2 flex items-center justify-center text-white font-bold text-lg">S</div>
+                                    <div class="text-sm font-medium text-gray-900">Sarah L.</div>
+                                    <div class="text-xs text-gray-500 mb-2">1,156 pts</div>
+                                    <div class="w-8 h-8 bg-orange-100 rounded-full mx-auto flex items-center justify-center">
+                                        <span class="text-lg">🥉</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Your Position -->
+                            <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                                <div class="w-8 text-center font-bold text-emerald-700">18</div>
+                                <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">P</div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Priya S. (You)</div>
+                                    <div class="text-sm text-gray-500">Delhi</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-emerald-700">260 pts</div>
+                                    <div class="text-xs text-emerald-600">↑3 this week</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Stats -->
+                    <div class="space-y-6">
+                        <!-- Your Stats -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Stats</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <div class="text-2xl font-bold text-emerald-700">#18</div>
+                                    <div class="text-sm text-gray-600">Current Rank</div>
+                                    <div class="text-xs text-emerald-600 mt-1">↑3 positions</div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                        <div class="text-lg font-bold text-blue-700">260</div>
+                                        <div class="text-xs text-gray-600">Total Points</div>
+                                    </div>
+                                    <div class="text-center p-3 bg-purple-50 rounded-lg">
+                                        <div class="text-lg font-bold text-purple-700">5</div>
+                                        <div class="text-xs text-gray-600">Videos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Next Milestone -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Next Milestone</h3>
+                            
+                            <div class="text-center">
+                                <div class="text-3xl mb-2">🎯</div>
+                                <div class="text-sm text-gray-600 mb-2">Reach Top 15</div>
+                                <div class="text-lg font-bold text-emerald-700">40 points to go</div>
+                                
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                                    <div class="bg-emerald-500 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rewards Page -->
+        <div id="rewards-page" class="page-content hidden">
+            <div class="max-w-7xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Rewards & Badges 🎁</h2>
+                    <p class="mt-1 text-gray-600">Earn badges, unlock achievements, and redeem exciting rewards!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Badges Collection -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Badge Collection</h3>
+                                <span class="text-sm text-emerald-600 font-medium">4 of 8 unlocked</span>
+                            </div>
+                            
+                            <!-- Unlocked Badges -->
+                            <div class="mb-6">
+                                <h4 class="text-md font-medium text-gray-900 mb-4">Earned Badges</h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div class="text-center p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                                        <div class="text-3xl mb-2">🏆</div>
+                                        <div class="text-sm font-medium text-gray-700">First Upload</div>
+                                        <div class="text-xs text-gray-500 mt-1">Jan 10, 2025</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                        <div class="text-3xl mb-2">🎬</div>
+                                        <div class="text-sm font-medium text-gray-700">Video Creator</div>
+                                        <div class="text-xs text-gray-500 mt-1">Jan 12, 2025</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-green-50 rounded-xl border border-green-200">
+                                        <div class="text-3xl mb-2">📈</div>
+                                        <div class="text-sm font-medium text-gray-700">Trending</div>
+                                        <div class="text-xs text-gray-500 mt-1">Jan 15, 2025</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-purple-50 rounded-xl border border-purple-200">
+                                        <div class="text-3xl mb-2">👥</div>
+                                        <div class="text-sm font-medium text-gray-700">Community Favorite</div>
+                                        <div class="text-xs text-gray-500 mt-1">Jan 18, 2025</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Locked Badges -->
+                            <div>
+                                <h4 class="text-md font-medium text-gray-900 mb-4">Available Badges</h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div class="text-center p-4 bg-gray-50 rounded-xl border border-gray-200 badge-locked">
+                                        <div class="text-3xl mb-2">⭐</div>
+                                        <div class="text-sm font-medium text-gray-500">Top Creator</div>
+                                        <div class="text-xs text-gray-400 mt-1">Reach top 10</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-gray-50 rounded-xl border border-gray-200 badge-locked">
+                                        <div class="text-3xl mb-2">🔥</div>
+                                        <div class="text-sm font-medium text-gray-500">Viral Hit</div>
+                                        <div class="text-xs text-gray-400 mt-1">10K+ views</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-gray-50 rounded-xl border border-gray-200 badge-locked">
+                                        <div class="text-3xl mb-2">🎓</div>
+                                        <div class="text-sm font-medium text-gray-500">Graduate</div>
+                                        <div class="text-xs text-gray-400 mt-1">Complete bootcamp</div>
+                                    </div>
+                                    
+                                    <div class="text-center p-4 bg-gray-50 rounded-xl border border-gray-200 badge-locked">
+                                        <div class="text-3xl mb-2">💎</div>
+                                        <div class="text-sm font-medium text-gray-500">Diamond Creator</div>
+                                        <div class="text-xs text-gray-400 mt-1">1000+ points</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rewards Store -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Rewards Store</h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="border border-gray-200 rounded-xl p-4">
+                                    <div class="text-center mb-4">
+                                        <div class="text-4xl mb-2">🎧</div>
+                                        <h4 class="font-medium text-gray-900">Wireless Earbuds</h4>
+                                        <p class="text-sm text-gray-600">Premium quality audio gear</p>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-sm text-gray-500">Cost</span>
+                                        <span class="font-bold text-emerald-600">500 points</span>
+                                    </div>
+                                    
+                                    <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                                        Redeem Now
+                                    </button>
+                                </div>
+                                
+                                <div class="border border-gray-200 rounded-xl p-4">
+                                    <div class="text-center mb-4">
+                                        <div class="text-4xl mb-2">☕</div>
+                                        <h4 class="font-medium text-gray-900">Café Voucher</h4>
+                                        <p class="text-sm text-gray-600">₹500 coffee shop credit</p>
+                                    </div>
+                                    
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-sm text-gray-500">Cost</span>
+                                        <span class="font-bold text-emerald-600">200 points</span>
+                                    </div>
+                                    
+                                    <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium">
+                                        Redeem Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <!-- Points Balance -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Points Balance</h3>
+                            
+                            <div class="text-center mb-4">
+                                <div class="text-3xl font-bold text-emerald-700">260</div>
+                                <div class="text-sm text-gray-600">Available Points</div>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Earned this week</span>
+                                    <span class="font-medium text-green-600">+45</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Total earned</span>
+                                    <span class="font-medium">360</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Redeemed</span>
+                                    <span class="font-medium">100</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span class="text-green-600 text-xs">+</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Challenge completed</div>
+                                        <div class="text-xs text-gray-500">+50 points • 2 days ago</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <span class="text-blue-600 text-xs">🏆</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">Badge earned</div>
+                                        <div class="text-xs text-gray-500">Trending • 3 days ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings-page" class="page-content hidden">
+            <div class="max-w-4xl mx-auto px-6 py-6">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900">Settings ⚙️</h2>
+                    <p class="mt-1 text-gray-600">Manage your profile, preferences, and account settings.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Profile Information -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Profile Information</h3>
+                            <button id="edit-profile-btn" onclick="toggleEdit()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700">
+                                Edit Profile
+                            </button>
+                        </div>
+                        
+                        <form id="profile-form">
+                            <!-- Profile Picture -->
+                            <div class="flex items-center gap-6 mb-6">
+                                <div class="h-20 w-20 rounded-full bg-emerald-500 flex items-center justify-center text-white text-2xl font-bold">
+                                    P
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Profile Picture</h4>
+                                    <p class="text-sm text-gray-600 mb-2">Update your profile photo</p>
+                                    <button type="button" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                                        Change Photo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Form Fields -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                    <input type="text" id="fullname" value="Priya Sharma" disabled 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                    <input type="text" id="username" value="priya_delhi" disabled 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <input type="email" id="email" value="priya.sharma@email.com" disabled 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                    <input type="tel" id="phone" value="+91 98765 43210" disabled 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                    <select id="city" disabled class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                        <option>Delhi</option>
+                                        <option>Mumbai</option>
+                                        <option>Bangalore</option>
+                                        <option>Chennai</option>
+                                        <option>Kolkata</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                                    <input type="date" id="dob" value="1995-06-15" disabled 
+                                           class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                                <textarea rows="3" id="bio" disabled placeholder="Tell others about yourself and your content..." 
+                                          class="w-full rounded-xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 px-4 py-3 disabled:bg-gray-50 disabled:text-gray-500">Passionate content creator showcasing the vibrant culture and hidden gems of Delhi. Love exploring street food, local markets, and historical places!</textarea>
+                            </div>
+                            
+                            <!-- Save/Cancel Buttons -->
+                            <div id="form-buttons" class="mt-6 flex justify-end gap-3 hidden">
+                                <button type="button" onclick="cancelEdit()" class="px-6 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Account Settings</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- Privacy Settings -->
+                            <div>
+                                <h4 class="font-medium text-gray-900 mb-4">Privacy Settings</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium text-gray-900">Profile Visibility</div>
+                                            <div class="text-sm text-gray-500">Make your profile visible to other creators</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium text-gray-900">Show on Leaderboard</div>
+                                            <div class="text-sm text-gray-500">Display your ranking publicly</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notification Settings -->
+                            <div>
+                                <h4 class="font-medium text-gray-900 mb-4">Notification Preferences</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium text-gray-900">New Challenges</div>
+                                            <div class="text-sm text-gray-500">Get notified when new challenges are available</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium text-gray-900">Leaderboard Updates</div>
+                                            <div class="text-sm text-gray-500">Weekly ranking changes and achievements</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-medium text-gray-900">Email Notifications</div>
+                                            <div class="text-sm text-gray-500">Receive important updates via email</div>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Danger Zone -->
+                            <div class="border-t border-gray-200 pt-6">
+                                <h4 class="font-medium text-red-600 mb-4">Danger Zone</h4>
+                                <div class="space-y-3">
+                                    <button class="w-full text-left p-4 border border-red-200 rounded-lg hover:bg-red-50 transition">
+                                        <div class="font-medium text-red-600">Delete Account</div>
+                                        <div class="text-sm text-gray-500">Permanently delete your account and all data</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            document.getElementById(`${pageId}-page`).classList.remove('hidden');
+            
+            // Update active navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-emerald-50', 'text-emerald-700', 'font-medium');
+                item.classList.add('text-gray-600');
+            });
+            
+            event.target.classList.add('bg-emerald-50', 'text-emerald-700', 'font-medium');
+            event.target.classList.remove('text-gray-600');
+        }
+
+        // Challenge tabs
+        function switchTab(tab) {
+            document.querySelectorAll('[id$="-tab"]').forEach(t => {
+                t.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                t.classList.add('text-gray-600');
+            });
+            
+            document.getElementById(`${tab}-tab`).classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+            document.getElementById(`${tab}-tab`).classList.remove('text-gray-600');
+
+            document.querySelectorAll('[id$="-content"]').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(`${tab}-content`).classList.remove('hidden');
+        }
+
+        // Profile editing
+        function toggleEdit() {
+            const inputs = document.querySelectorAll('#profile-form input, #profile-form select, #profile-form textarea');
+            const editBtn = document.getElementById('edit-profile-btn');
+            const formButtons = document.getElementById('form-buttons');
+            
+            inputs.forEach(input => {
+                input.disabled = false;
+                input.classList.remove('disabled:bg-gray-50', 'disabled:text-gray-500');
+            });
+            
+            editBtn.style.display = 'none';
+            formButtons.classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            const inputs = document.querySelectorAll('#profile-form input, #profile-form select, #profile-form textarea');
+            const editBtn = document.getElementById('edit-profile-btn');
+            const formButtons = document.getElementById('form-buttons');
+            
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.classList.add('disabled:bg-gray-50', 'disabled:text-gray-500');
+            });
+            
+            editBtn.style.display = 'block';
+            formButtons.classList.add('hidden');
+        }
+
+        // Form submission
+        document.getElementById('submission-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const url = document.getElementById('video-url').value;
+            const title = document.getElementById('video-title').value;
+            const description = document.getElementById('video-description').value;
+            const location = document.getElementById('video-location').value;
+            const terms = document.getElementById('terms').checked;
+            
+            if (!url || !title || !description || !location) {
+                showNotification('Please fill in all required fields!', 'error');
+                return;
+            }
+            
+            if (!terms) {
+                showNotification('Please agree to terms and conditions!', 'error');
+                return;
+            }
+            
+            showNotification('Video submitted successfully! It will be reviewed within 24 hours.', 'success');
+            this.reset();
+        });
+
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showNotification('Profile updated successfully!', 'success');
+            cancelEdit();
+        });
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                'bg-blue-100 text-blue-800 border border-blue-200'
+            }`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-lg font-bold">&times;</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+
+        // Enhanced Dashboard State with Notification System
+        class CreatorDashboard {
+            constructor() {
+                this.notifications = [
+                    {
+                        id: 1,
+                        type: 'approved',
+                        title: 'Video Approved!',
+                        message: '"Delhi Street Food Adventures" has been approved and published',
+                        details: '+50 points earned',
+                        time: '2 hours ago',
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        type: 'pending',
+                        title: 'Under Review',
+                        message: '"Connaught Place Evening Walk" is being reviewed by our team',
+                        details: 'Expected approval within 24 hours',
+                        time: '1 day ago',
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        type: 'rejected',
+                        title: 'Video Rejected',
+                        message: '"Random City Video" needs improvements',
+                        details: 'Click to see feedback',
+                        time: '2 days ago',
+                        read: false
+                    },
+                    {
+                        id: 4,
+                        type: 'completed',
+                        title: 'Challenge Completed!',
+                        message: 'Successfully completed "Mumbai Heritage Sites" challenge',
+                        details: 'Ranked #7 out of 156 participants',
+                        time: '3 days ago',
+                        read: false
+                    }
+                ];
+                
+                this.initializeEventListeners();
+                this.updateNotificationCount();
+            }
+
+            initializeEventListeners() {
+                // Form submission
+                document.getElementById('submission-form')?.addEventListener('submit', (e) => this.handleSubmission(e));
+                
+                // Window resize
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            handleSubmission(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    url: document.getElementById('video-url').value,
+                    title: document.getElementById('video-title').value,
+                    description: document.getElementById('video-description').value,
+                    challenge: document.getElementById('video-challenge').value,
+                    location: document.getElementById('video-location').value,
+                    terms: document.getElementById('terms').checked
+                };
+                
+                if (!formData.url || !formData.title || !formData.description || !formData.location) {
+                    this.showNotification('Please fill in all required fields.', 'error');
+                    return;
+                }
+                
+                if (!formData.terms) {
+                    this.showNotification('Please agree to the terms and conditions.', 'error');
+                    return;
+                }
+                
+                this.showNotification('Video submitted successfully! It will be reviewed within 24 hours.', 'success');
+                document.getElementById('submission-form').reset();
+                
+                // Add to notifications
+                this.addNotification({
+                    type: 'pending',
+                    title: 'Video Submitted',
+                    message: `"${formData.title}" has been submitted for review`,
+                    details: 'You will be notified once reviewed',
+                    time: 'Just now'
+                });
+            }
+
+            addNotification(notificationData) {
+                const newNotification = {
+                    id: Date.now(),
+                    read: false,
+                    ...notificationData
+                };
+                this.notifications.unshift(newNotification);
+                this.updateNotificationCount();
+                this.renderNotifications();
+            }
+
+            updateNotificationCount() {
+                const unreadCount = this.notifications.filter(n => !n.read).length;
+                const countElement = document.getElementById('notification-count');
+                if (countElement) {
+                    countElement.textContent = unreadCount;
+                    countElement.style.display = unreadCount > 0 ? 'flex' : 'none';
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-20 right-4 p-4 rounded-lg shadow-lg z-50 notification-slide max-w-sm ${
+                    type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                    type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                    'bg-blue-100 text-blue-800 border border-blue-200'
+                }`;
+                
+                notification.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium">${message}</span>
+                        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-lg font-bold">&times;</button>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
+            }
+
+            handleResize() {
+                // Handle responsive behavior
+            }
+        }
+
+        // Navigation Functions
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            document.getElementById(`${pageId}-page`).classList.remove('hidden');
+            
+            // Update active navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-emerald-50', 'text-emerald-700', 'font-medium');
+                item.classList.add('text-gray-600');
+            });
+            
+            event.target.classList.add('bg-emerald-50', 'text-emerald-700', 'font-medium');
+            event.target.classList.remove('text-gray-600');
+        }
+
+        // Notification Functions
+        function toggleNotifications() {
+            const panel = document.getElementById('notifications-panel');
+            const isOpen = !panel.classList.contains('translate-x-full');
+            
+            if (isOpen) {
+                panel.classList.add('translate-x-full');
+            } else {
+                panel.classList.remove('translate-x-full');
+            }
+        }
+
+        function markAllAsRead() {
+            dashboardState.notifications.forEach(n => n.read = true);
+            dashboardState.updateNotificationCount();
+            showNotification('All notifications marked as read', 'success');
+        }
+
+        function showRejectionDetails() {
+            showPage('rejected-videos');
+            toggleNotifications();
+        }
+
+        function showAllNotifications() {
+            // Could open a dedicated notifications page
+            alert('Full notifications page would open here');
+        }
+
+        // Challenge Tab Functions
+        function switchTab(tab) {
+            document.querySelectorAll('[id$="-tab"]').forEach(t => {
+                t.classList.remove('tab-active');
+                t.classList.add('tab-inactive');
+            });
+            
+            document.getElementById(`${tab}-tab`).classList.add('tab-active');
+            document.getElementById(`${tab}-tab`).classList.remove('tab-inactive');
+
+            document.querySelectorAll('[id$="-content"]').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(`${tab}-content`).classList.remove('hidden');
+        }
+
+        // Rejected Video Functions
+        function resubmitVideo(videoId) {
+            showPage('submit');
+            showNotification('Redirecting to submit page for resubmission...', 'info');
+        }
+
+        function contactSupport(videoId) {
+            showNotification('Opening support chat...', 'info');
+        }
+
+        function viewGuidelines() {
+            showNotification('Opening content guidelines...', 'info');
+        }
+
+        function watchTutorial(type) {
+            showNotification(`Opening ${type} tutorial...`, 'info');
+        }
+
+        // Utility Functions
+        function showNotification(message, type = 'info') {
+            dashboardState.showNotification(message, type);
+        }
+
+        // Initialize the dashboard
+        let dashboardState;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            dashboardState = new CreatorDashboard();
+            showPage('dashboard');
+        });
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notifications-panel');
+            const button = document.getElementById('notifications-btn');
+            
+            if (!panel.contains(e.target) && !button.contains(e.target)) {
+                panel.classList.add('translate-x-full');
+            }
+        });
+
+        
+    </script>
+</body>
+</html>

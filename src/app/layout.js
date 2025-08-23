@@ -1,10 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ClientProvider from "@/components/ClientProvider/ClientProvider";
+import ClientProvider from "../components/ClientProvider/ClientProvider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth";
-import store from "@/store";
-import InitialStateManager from "@/components/InitialStateManager/InitialStateManager";
+import { authOptions } from "../lib/auth/auth";
+
+import InitialStateManager from "../components/InitialStateManager/InitialStateManager";
 
 // Load Google Fonts
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });

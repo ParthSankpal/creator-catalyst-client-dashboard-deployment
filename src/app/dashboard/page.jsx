@@ -1,26 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
 
 export default function Dashboard() {
-  const { data: session } = useSession();
+  const user = useSelector((state) => state.user.user);
+  const token = useSelector((state) => state.user.token);
+
   const [youtubeData, setYoutubeData] = useState(null);
 
   useEffect(() => {
-    if (session) {
-      fetch("/api/youtube/channels")
+    if (token) {
+      fetch("/api/youtube/channels", {
+        headers: {
+          Authorization: `Bearer ${token}`, // send JWT to backend if needed
+        },
+      })
         .then((res) => res.json())
         .then((data) => setYoutubeData(data))
         .catch((err) => console.error(err));
     }
-  }, [session]);
+  }, [token]);
 
-  if (!session) return <p>Please log in to see your YouTube data.</p>;
+  if (!user) return <p>Please log in to see your YouTube data.</p>;
 
   return (
     <div>
-      <h1>Welcome {session.user?.name}</h1>
+      <h1>Welcome {user.name}</h1>
       {youtubeData ? (
         <div>
           <h2>Your YouTube Channels</h2>

@@ -1,12 +1,15 @@
-import { axiosClient } from './apiClient';
+import { axiosClient } from "../utils/apiClient";
 
-export const startGoogle = async () => {
-  // server will redirect; here we just navigate
-  window.location.href = '/api/auth/google/start';
+
+export const startGoogle = () => {
+  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/start`;
 };
+
 
 export const getUser = async () => {
   const res = await axiosClient.get('/api/auth/getUser');
+  console.log(res, res.data);
+  
   return res.data; // { user }
 };
 

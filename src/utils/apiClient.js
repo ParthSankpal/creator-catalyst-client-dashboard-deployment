@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { allowClientIdByPass } from '@/utils/auth';
+import { allowClientIdByPass } from '../utils/auth';
 
 const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL;
 axios.defaults.withCredentials = true;
