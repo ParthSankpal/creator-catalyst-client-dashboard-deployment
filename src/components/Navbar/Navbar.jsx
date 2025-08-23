@@ -2,6 +2,7 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { BellIcon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import ThemeToggle from '../ThemeToggle/ThemeToggle'
 
 const userNavigation = [
   { name: 'Your profile', href: '#' },
@@ -38,6 +39,7 @@ export default function Navbar() {
         </div>
       </form>
 
+      <ThemeToggle />
       {/* Notifications + Profile */}
       <div className="flex items-center gap-x-4">
         <button className="text-gray-400 hover:text-gray-500 dark:hover:text-white">

@@ -13,7 +13,7 @@ export default function Dashboard() {
     if (token) {
       fetch("/api/youtube/channels", {
         headers: {
-          Authorization: `Bearer ${token}`, // send JWT to backend if needed
+          Authorization: `Bearer ${token}`,
         },
       })
         .then((res) => res.json())
