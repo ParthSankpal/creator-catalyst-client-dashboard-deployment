@@ -21,7 +21,7 @@ const navigation = [
   { name: 'Modules', href: '#', icon: CalendarIcon, current: false },
   { name: 'Leaderboard', href: '#', icon: DocumentDuplicateIcon, current: false },
   { name: 'Rewards', href: '#', icon: ChartPieIcon, current: false },
-  { name: 'Settings', href: '#', icon: ChartPieIcon, current: false },
+  { name: 'Settings', href: '/settings', icon: ChartPieIcon, current: false },
 ]
 
 function classNames(...classes) {
