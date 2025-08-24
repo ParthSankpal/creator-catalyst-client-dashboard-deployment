@@ -3,7 +3,7 @@
 import InputField from "../InputField/InputField";
 import TextAreaField from "../TextAreaField/TextareaField";
 import SelectField from "../SelectField/SelectField";
-import CheckboxField from "../CheckboxField/CheckboxField";
+
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 
 export default function SettingsPage() {
@@ -38,6 +38,7 @@ export default function SettingsPage() {
                                 defaultValue="priya.sharma@email.com"
                             />
                             <SelectField
+                            id="select city"
                                 label="City"
                                 options={["Delhi", "Mumbai", "Bangalore", "Chennai", "Kolkata"]}
                                 defaultValue="Delhi"
