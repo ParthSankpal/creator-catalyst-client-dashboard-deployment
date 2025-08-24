@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Cog6ToothIcon,
   HomeIcon,
@@ -20,7 +19,7 @@ const navigation = [
   { name: 'Challenges', href: '#', icon: FolderIcon, current: false },
   { name: 'Modules', href: '#', icon: CalendarIcon, current: false },
   { name: 'Leaderboard', href: '#', icon: DocumentDuplicateIcon, current: false },
-  { name: 'Rewards', href: '#', icon: ChartPieIcon, current: false },
+  { name: 'Rewards', href: '/rewards', icon: ChartPieIcon, current: false },
   { name: 'Settings', href: '/settings', icon: ChartPieIcon, current: false },
 ]
 
