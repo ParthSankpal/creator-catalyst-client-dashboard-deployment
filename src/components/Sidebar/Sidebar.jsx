@@ -15,8 +15,8 @@ import {
 } from '@heroicons/react/24/outline'
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-  { name: 'Submit', href: '#', icon: UsersIcon, current: false },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
+  { name: 'Submit', href: '/submit', icon: UsersIcon, current: false },
   { name: 'Challenges', href: '#', icon: FolderIcon, current: false },
   { name: 'Modules', href: '#', icon: CalendarIcon, current: false },
   { name: 'Leaderboard', href: '#', icon: DocumentDuplicateIcon, current: false },
