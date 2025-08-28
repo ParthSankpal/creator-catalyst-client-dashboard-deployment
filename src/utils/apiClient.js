@@ -6,8 +6,10 @@ axios.defaults.withCredentials = true;
 
 const instance = axios.create({
   baseURL: BASE_API_URL,
+  withCredentials: true,   
   headers: { 'Content-Type': 'application/json' }
 });
+
 
 const addAuthHeaderToAxios = (authHeader) => {
   instance.defaults.headers.common['Authorization'] = authHeader;

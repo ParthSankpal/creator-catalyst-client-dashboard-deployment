@@ -3,16 +3,22 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { BellIcon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import ThemeToggle from '../ThemeToggle/ThemeToggle'
+import { useRouter } from 'next/navigation'
+import { logout } from '../../api/authApi'
 
 const userNavigation = [
-  { name: 'Your profile', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Your profile', href: '/profile' },
+
 ]
 
 export default function Navbar() {
+  const router = useRouter();
+
+
+
   return (
     <div className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm dark:border-white/10 dark:bg-gray-900">
-      {/* Full width Logo */}
+      {/* Logo */}
       <div className="flex items-center gap-x-4">
         <img
           alt="Your Company"
@@ -40,6 +46,7 @@ export default function Navbar() {
       </form>
 
       <ThemeToggle />
+
       {/* Notifications + Profile */}
       <div className="flex items-center gap-x-4">
         <button className="text-gray-400 hover:text-gray-500 dark:hover:text-white">
@@ -54,14 +61,38 @@ export default function Navbar() {
             />
             <ChevronDownIcon className="ml-2 h-4 w-4 text-gray-500" />
           </MenuButton>
+
           <MenuItems className="absolute right-0 mt-2 w-32 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
             {userNavigation.map((item) => (
               <MenuItem key={item.name}>
-                <a href={item.href} className="block px-3 py-1 text-sm text-gray-700 dark:text-white">
-                  {item.name}
-                </a>
+                {item.name === 'Sign out' ? (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-1 text-sm text-gray-700 dark:text-white"
+                  >
+                    {item.name}
+                  </button>
+                ) : (
+                  <a
+                    href={item.href}
+                    className="block px-3 py-1 text-sm text-gray-700 dark:text-white"
+                  >
+                    {item.name}
+                  </a>
+                )}
               </MenuItem>
             ))}
+            <MenuItem key="logout">
+              <button
+                onClick={async () => {
+                  await logout();           // clear cookies even if 401
+                  router.push("/login");    // redirect
+                }}
+                className="w-full text-left px-3 py-1 text-sm text-gray-700 dark:text-white"
+              >
+                Sign out
+              </button>
+            </MenuItem>
           </MenuItems>
         </Menu>
       </div>

@@ -1,4 +1,5 @@
 import { axiosClient } from "../utils/apiClient";
+import { removeCookie } from "../utils/cookieHandler";
 
 
 export const startGoogle = () => {
@@ -7,15 +8,25 @@ export const startGoogle = () => {
 
 
 export const getUser = async () => {
-  const res = await axiosClient.get('/api/auth/getUser');
-  console.log(res, res.data);
-  
+  const res = await axiosClient.get("/api/auth/getUser");
+  console.log("getUser response:", res.data);
   return res.data; // { user }
 };
 
+
 export const logout = async () => {
-  await axiosClient.post('/api/auth/logout');
+  try {
+    await axiosClient.post("/api/auth/logout");
+  } catch (err) {
+    // Optional: log error, but don’t block logout
+    console.warn("Logout API returned an error (probably 401):", err?.response?.status);
+  } finally {
+    // Remove client-side cookies anyway
+    removeCookie("jwt");
+    removeCookie("user");
+  }
 };
+
 
 export const login = async (email, password) => {
   // kept from your pattern (if you have email/pwd path)
