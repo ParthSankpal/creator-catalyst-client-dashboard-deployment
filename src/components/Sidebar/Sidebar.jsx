@@ -20,7 +20,7 @@ const navigation = [
   { name: 'Modules', href: '/modules', icon: CalendarIcon, current: false },
   { name: 'Leaderboard', href: '/leaderboard', icon: DocumentDuplicateIcon, current: false },
   { name: 'Rewards', href: '/rewards', icon: ChartPieIcon, current: false },
-  { name: 'Settings', href: '/settings', icon: ChartPieIcon, current: false },
+  { name: 'Settings', href: '/settings', icon: Cog6ToothIcon, current: false },
 ]
 
 function classNames(...classes) {
@@ -71,16 +71,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         </ul>
       </nav>
 
-      {/* Settings at Bottom */}
-      <div className="p-2 mt-auto">
-        <a
-          href="#"
-          className="group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
-        >
-          <Cog6ToothIcon className="h-6 w-6 shrink-0" />
-          {!collapsed && <span>Settings</span>}
-        </a>
-      </div>
+      
     </div>
   )
 }
