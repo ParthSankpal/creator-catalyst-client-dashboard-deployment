@@ -16,9 +16,9 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: true },
   { name: 'Submit', href: '/submit', icon: UsersIcon, current: false },
-  { name: 'Challenges', href: '#', icon: FolderIcon, current: false },
+  { name: 'Challenges', href: '/challenges', icon: FolderIcon, current: false },
   { name: 'Modules', href: '/modules', icon: CalendarIcon, current: false },
-  { name: 'Leaderboard', href: '#', icon: DocumentDuplicateIcon, current: false },
+  { name: 'Leaderboard', href: '/leaderboard', icon: DocumentDuplicateIcon, current: false },
   { name: 'Rewards', href: '/rewards', icon: ChartPieIcon, current: false },
   { name: 'Settings', href: '/settings', icon: ChartPieIcon, current: false },
 ]
