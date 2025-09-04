@@ -18,6 +18,7 @@ const InitialStateManager = () => {
 
   useEffect(() => {
     const publicPages = [
+      "/",
       "/privacy-policy",
       "/terms-conditions",
       "/recover-password",
