@@ -1,5 +1,6 @@
 "use client";
 
+import { addAuthHeaderToAxios } from "../../utils/apiClient";
 import { getUser } from "../../api/authApi";
 import { setUser } from "../../store/slices/userSlice";
 import { getCookie } from "../../utils/cookieHandler";
@@ -31,6 +32,10 @@ const InitialStateManager = () => {
         // ✅ First check cookies (fast, no API)
         const jwt = getCookie("jwt");
         const storedUser = getCookie("user");
+
+        if (jwt) {
+          addAuthHeaderToAxios(`Bearer ${jwt}`);
+        }
 
         if (user) {
           // already in Redux → skip

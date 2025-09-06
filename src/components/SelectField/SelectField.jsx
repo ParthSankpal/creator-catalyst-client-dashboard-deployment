@@ -40,9 +40,9 @@ export default function SelectField({
           control: ({ isFocused }) =>
             `flex items-center rounded-lg border px-3 py-2 min-h-[2.5rem] cursor-pointer
              ${isFocused ? "border-emerald-500 ring-2 ring-emerald-300" : "border-gray-300 dark:border-gray-600"}
-             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`,
+             bg-white dark:bg-[#222222] text-gray-900 dark:text-gray-100`,
           menu: () =>
-            "mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg z-50",
+            "mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#222222] shadow-lg z-50",
           option: ({ isFocused, isSelected }) =>
             `px-3 py-2 cursor-pointer 
              ${isSelected ? "bg-emerald-600 text-white" : ""}

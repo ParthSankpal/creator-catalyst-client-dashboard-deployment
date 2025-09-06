@@ -2,7 +2,7 @@
 
 export default function BadgesCard({ data }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Badges
@@ -18,7 +18,7 @@ export default function BadgesCard({ data }) {
             className={`text-center p-3 rounded-xl ${
               badge.unlocked
                 ? "bg-yellow-50 dark:bg-yellow-900/30"
-                : "bg-gray-50 dark:bg-gray-700/50"
+                : "bg-gray-50 dark:bg-[#3f3f3f]/50"
             }`}
           >
             <div className="text-2xl mb-1">{badge.icon}</div>

@@ -22,7 +22,7 @@ export default function RecentSubmissions() {
     <Card title="Recent Submissions">
       <div className="space-y-3">
         {submissions.map((sub, i) => (
-          <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-[#222222]">
             <div className={`w-12 h-8 bg-gradient-to-br ${sub.bg} rounded`}></div>
             <div className="flex-1">
               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{sub.title}</div>

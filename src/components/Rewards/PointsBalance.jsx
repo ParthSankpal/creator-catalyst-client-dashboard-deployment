@@ -2,7 +2,7 @@
 
 const PointsBalance = () => {
     return (
-        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+        <section className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Points Balance
             </h3>

@@ -6,7 +6,7 @@ import RecentSubmissions from "./RecentSubmissions";
 
 export default function SubmitPage() {
   return (
-    <div id="creator-submit" className="page-content min-h-screen dark:bg-gray-900">
+    <div id="creator-submit" className="page-content min-h-screen dark:bg-[#222222]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Heading */}
         <div className="mb-8">

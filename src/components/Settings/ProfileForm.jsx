@@ -14,7 +14,7 @@ export default function ProfileForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6"
+      className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6"
     >
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         Profile Information

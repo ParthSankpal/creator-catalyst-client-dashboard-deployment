@@ -2,7 +2,7 @@
 
 export default function ModuleCard({ data }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
         Current Module 📚
       </h3>
@@ -16,7 +16,7 @@ export default function ModuleCard({ data }) {
         {data.actions.map((action, i) => (
           <button
             key={i}
-            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 px-3 rounded-lg text-sm font-medium transition"
+            className="bg-gray-100 dark:bg-[#3f3f3f] hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 px-3 rounded-lg text-sm font-medium transition"
           >
             {action}
           </button>

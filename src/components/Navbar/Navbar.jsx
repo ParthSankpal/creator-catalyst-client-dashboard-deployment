@@ -17,7 +17,7 @@ export default function Navbar() {
 
 
   return (
-    <div className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm dark:border-white/10 dark:bg-gray-900">
+    <div className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm dark:border-white/10 dark:bg-[#222222]">
       {/* Logo */}
       <div className="flex items-center gap-x-4">
         <img
@@ -39,7 +39,7 @@ export default function Navbar() {
             type="text"
             name="search"
             placeholder="Search"
-            className="w-full rounded-md border border-gray-200 bg-white py-1.5 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:border-white/10 dark:bg-gray-800 dark:text-white"
+            className="w-full rounded-md border border-gray-200 bg-white py-1.5 pl-8 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:border-white/10 dark:bg-[#222222] dark:text-white"
           />
           <MagnifyingGlassIcon className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
         </div>
@@ -62,7 +62,7 @@ export default function Navbar() {
             <ChevronDownIcon className="ml-2 h-4 w-4 text-gray-500" />
           </MenuButton>
 
-          <MenuItems className="absolute right-0 mt-2 w-32 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
+          <MenuItems className="absolute right-0 mt-2 w-32 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-[#222222]">
             {userNavigation.map((item) => (
               <MenuItem key={item.name}>
                 {item.name === 'Sign out' ? (

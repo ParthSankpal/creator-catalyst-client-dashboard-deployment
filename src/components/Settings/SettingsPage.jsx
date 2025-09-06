@@ -8,7 +8,7 @@ export default function SettingsPage() {
     return (
         <div
             id="creator-settings"
-            className="page-content dark:bg-gray-900 min-h-screen transition-colors duration-300"
+            className="page-content dark:bg-[#222222] min-h-screen transition-colors duration-300"
         >
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Page Heading */}

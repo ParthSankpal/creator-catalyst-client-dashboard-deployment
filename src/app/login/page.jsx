@@ -11,23 +11,7 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const status = useSelector(s => s.user.status);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        dispatch(setLoading());
-        const data = await getUser(); 
-        console.log(data);
-        
-        if (!mounted) return;
-        dispatch(setUser(data.user));
-        router.replace('/dashboard');
-      } catch {
-        if (!mounted) dispatch(setUser(null));
-      }
-    })();
-    return () => { mounted = false; };
-  }, [dispatch, router]);
+  
 
   return (
     <main className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50">

@@ -1,107 +1,75 @@
-import React from 'react'
-import ProgressCard from './ProgressCard'
-import ModuleCard from './ModuleCard'
+"use client";
+
+import React, { useEffect, useState } from "react";
+import ProgressCard from "./ProgressCard";
+import ModuleCard from "./ModuleCard";
+import { transformModulesData, calculateProgress } from "../../utils/modules";
+import { getCreatorModules } from "../../api/modules";
 
 const ModulesPage = () => {
+  const [modules, setModules] = useState([]);
+  const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const moduleCardData = [
-        {
-            icon: '📱',
-            title: 'Week 1: Getting Started',
-            description: 'Learn the basics of mobile content creation, equipment setup, and platform requirements.',
-            videos: "3/3",
-            assignments: "2/2",
-            score: "92%",
-            inProgress: false,
-            unlocked: true,
-        },
-        {
-            icon: '🎭',
-            title: 'Week 2: Storytelling',
-            description: 'Master the art of visual storytelling and narrative structure for short-form content.',
-            videos: "4/4",
-            assignments: "3/3",
-            score: "88%",
-            inProgress: false,
-            unlocked: true,
-        },
-        {
-            icon: '✂️',
-            title: 'Week 3: Editing & Tools',
-            description: 'Learn video editing techniques and essential tools for creating engaging short-form content.',
-            videos: "2/3",
-            assignments: "1/2",
-            score: "75%",
-            inProgress: true,
-            unlocked: true,
-        },
-        {
-            icon: '🎨',
-            title: 'Week 4: Visual Design',
-            description: 'Explore color theory, composition, and visual aesthetics for compelling content creation.',
-            videos: "0/4",
-            assignments: "0/3",
-            inProgress: false,
-            unlocked: false,
-            unlocksAt: "Jan 22",
-        },
-        {
-            icon: '📈',
-            title: 'Week 5: Growth & Analytics',
-            description: 'Understand audience engagement, analytics, and strategies for growing your content reach.',
-            videos: "0/3",
-            assignments: "0/2",
-            inProgress: false,
-            unlocked: false,
-            unlocksAt: "Jan 29",
-        },
-        {
-            icon: '🎓',
-            title: 'Week 6: Final Project',
-            description: "Apply everything you've learned in a comprehensive final project showcasing your skills.",
-            videos: "0/2",
-            assignments: "0/1",
-            inProgress: false,
-            unlocked: false,
-            unlocksAt: "Feb 5",
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const result = await getCreatorModules();
+        if (result.status === "success") {
+          const transformed = transformModulesData(result.data);
+          setModules(transformed);
+          setProgress(calculateProgress(transformed));
         }
-    ]
+      } catch (err) {
+        console.error("Error fetching modules:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return (
-        <div className="page-content min-h-screen dark:bg-gray-900">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="mb-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                        Learning Modules 📚
-                    </h2>
-                    <p className="mt-1 text-gray-600 dark:text-gray-400">
-                        Master content creation through our structured 6-week bootcamp program!
-                    </p>
-                </div>
-                <div className="mb-8">
-                    <ProgressCard/>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {
-                        moduleCardData.map((module, index) => (
-                            <ModuleCard 
-                                key={index}
-                                icon={module.icon}
-                                title={module.title}
-                                description={module.description}
-                                videos={module.videos}
-                                assignments={module.assignments}
-                                score={module.score}
-                                inProgress={module.inProgress}
-                                unlocked={module.unlocked}
-                                unlocksAt={module.unlocksAt}
-                            />
-                        ))
-                    }
-                </div>
-            </div>
+    fetchModules();
+  }, []);
+
+  return (
+    <div className="page-content min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Learning Modules 📚
+          </h2>
+          <p className="mt-1 text-gray-600 dark:text-gray-400">
+            Master content creation through our structured program!
+          </p>
         </div>
-    )
-}
 
-export default ModulesPage
+        <div className="mb-8">
+          {loading ? (
+            <p className="text-gray-500 dark:text-gray-400">Loading progress...</p>
+          ) : progress ? (
+            <ProgressCard progress={progress} />
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              No progress data available yet.
+            </p>
+          )}
+        </div>
+
+        {loading ? (
+          <p className="text-gray-500 dark:text-gray-400">Loading modules...</p>
+        ) : modules.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((module) => (
+              <ModuleCard key={module.id} {...module} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            No modules available right now.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ModulesPage;

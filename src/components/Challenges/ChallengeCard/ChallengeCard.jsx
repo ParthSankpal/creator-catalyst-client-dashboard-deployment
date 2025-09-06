@@ -20,7 +20,7 @@ export default function ChallengeCard(props) {
     <div
       className={`rounded-2xl shadow-xl p-6 border-l-4 ${borderColor} transition 
         bg-white text-gray-900 shadow-gray-200/40
-        dark:bg-gray-900 dark:text-gray-100 dark:shadow-gray-800
+        dark:bg-[#222222] dark:text-gray-100 dark:shadow-gray-800
       `}
     >
       <div className="flex items-center justify-between mb-4">
@@ -46,7 +46,9 @@ export default function ChallengeCard(props) {
         <>
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Participants</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Participants
+              </span>
               <span className="font-medium">{participants}</span>
             </div>
             <div className="flex justify-between">
@@ -54,9 +56,7 @@ export default function ChallengeCard(props) {
               <span className="font-medium text-emerald-600">{reward}</span>
             </div>
           </div>
-          <button
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition"
-          >
+          <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
             Submit Entry
           </button>
         </>
@@ -71,13 +71,15 @@ export default function ChallengeCard(props) {
               <span className="font-medium text-green-600">{rank}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Points Earned</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Points Earned
+              </span>
               <span className="font-medium text-green-600">{points}</span>
             </div>
           </div>
           <button
             className="w-full bg-gray-300 text-gray-700 py-2 rounded-lg font-medium cursor-not-allowed 
-                       dark:bg-gray-700 dark:text-gray-400"
+                       dark:bg-[#3f3f3f] dark:text-gray-400"
           >
             Challenge Ended
           </button>
@@ -89,8 +91,12 @@ export default function ChallengeCard(props) {
         <>
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Expected Reward</span>
-              <span className="font-medium text-purple-600">{expectedReward}</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Expected Reward
+              </span>
+              <span className="font-medium text-purple-600">
+                {expectedReward}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500 dark:text-gray-400">Duration</span>
@@ -99,7 +105,7 @@ export default function ChallengeCard(props) {
           </div>
           <button
             className="w-full bg-gray-300 text-gray-500 py-2 rounded-lg font-medium cursor-not-allowed 
-                       dark:bg-gray-700 dark:text-gray-400"
+                       dark:bg-[#3f3f3f] dark:text-gray-400"
           >
             Coming Soon
           </button>

@@ -2,7 +2,7 @@
 
 export default function ProgressCard({ data }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
         Your Progress 🎯
       </h3>
@@ -15,7 +15,7 @@ export default function ProgressCard({ data }) {
           <div className="text-sm text-gray-600 dark:text-gray-300">
             of {data.submissions.total} Shorts
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+          <div className="w-full bg-gray-200 dark:bg-[#3f3f3f] rounded-full h-2 mt-2">
             <div
               className="h-2 rounded-full bg-emerald-600 dark:bg-emerald-400"
               style={{ width: `${data.submissions.percent}%` }}

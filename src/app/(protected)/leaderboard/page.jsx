@@ -45,7 +45,7 @@ export default function LeaderboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Leaderboard */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
+          <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {activeTab === "city"
@@ -69,7 +69,7 @@ export default function LeaderboardPage() {
 
         {/* Sidebar Stats */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
+          <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               Your Stats
             </h3>
@@ -93,7 +93,7 @@ export default function LeaderboardPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
+          <div className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-black/20 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               Next Milestone
             </h3>
@@ -101,7 +101,7 @@ export default function LeaderboardPage() {
               <div className="text-3xl mb-2">🎯</div>
               <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Reach Top 15</div>
               <div className="text-lg font-bold text-emerald-700 dark:text-emerald-400">40 points to go</div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3">
+              <div className="w-full bg-gray-200 dark:bg-[#3f3f3f] rounded-full h-2 mt-3">
                 <div className="bg-emerald-500 h-2 rounded-full" style={{ width: "75%" }} />
               </div>
             </div>

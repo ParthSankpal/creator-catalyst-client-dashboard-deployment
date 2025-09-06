@@ -14,7 +14,7 @@ const BadgeCards = () => {
     ];
 
     return (
-        <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+        <section className="bg-white dark:bg-[#222222] rounded-2xl shadow-xl p-6">
             <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     Badges
@@ -27,7 +27,7 @@ const BadgeCards = () => {
                 <h3>Earned Badges</h3>
                 <div className="grid grid-cols-4 gap-3">
                     {earnedBadgesData.filter((b) => b.unlocked).map((badge, i) => (
-                        <div key={i} className={`text-center p-3 rounded-xl ${badge.unlocked ? "bg-yellow-50 dark:bg-yellow-900/30" : "bg-gray-50 dark:bg-gray-700/50"}`} >
+                        <div key={i} className={`text-center p-3 rounded-xl ${badge.unlocked ? "bg-yellow-50 dark:bg-yellow-900/30" : "bg-gray-50 dark:bg-[#3f3f3f]/50"}`} >
                             <div className="text-2xl mb-1">{badge.icon}</div>
                             <div className='text-sm'>
                                 {badge.label}
@@ -43,7 +43,7 @@ const BadgeCards = () => {
                 <h3>Available Badges</h3>
                 <div className="grid grid-cols-4 gap-3">
                     {earnedBadgesData.filter((b) => b.unlocked === false).map((badge, i) => (
-                        <div key={i} className={`text-center p-3 rounded-xl ${badge.unlocked ? "bg-yellow-50 dark:bg-yellow-900/30" : "bg-gray-50 dark:bg-gray-700/50"}`} >
+                        <div key={i} className={`text-center p-3 rounded-xl ${badge.unlocked ? "bg-yellow-50 dark:bg-yellow-900/30" : "bg-gray-50 dark:bg-[#3f3f3f]/50"}`} >
                             <div className="text-2xl mb-1">{badge.icon}</div>
                             <div className='text-sm'>
                                 {badge.label}

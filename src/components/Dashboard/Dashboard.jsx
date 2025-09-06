@@ -61,7 +61,7 @@ export default function Dashboard() {
   if (!user) return <p>Please log in to see your YouTube data.</p>;
 
   return (
-    <div className="page-content  dark:bg-gray-900 min-h-screen transition-colors">
+    <div className="page-content  min-h-screen transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           Hi, {user.name} from {user.city}! 👋
