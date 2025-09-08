@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import "./page.css";
 
 export default function Home() {
@@ -26,6 +27,12 @@ export default function Home() {
           height={600}
           priority
         />
+      </div>
+
+      <div className="button-container">
+        <Link href="/login" className="get-access-btn">
+          Get Access
+        </Link>
       </div>
     </div>
   );

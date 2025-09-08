@@ -43,6 +43,53 @@ html {
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
 }
 
+.button-container {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  z-index: 20;
+  animation: buttonPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 2.8s forwards;
+}
+
+.get-access-btn {
+  display: inline-block;
+  padding: 30px 40px;
+  background: #000ecb;
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: 200;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes buttonPop {
+  0% {
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: translateX(-50%) scale(0.95);
+    opacity: 1;
+  }
+  85% {
+    transform: translateX(-50%) scale(1.02);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes notificationPop {
   0% {
     transform: scale(0) rotate(-5deg);
@@ -131,5 +178,14 @@ html {
 
   .content-overlay p {
     font-size: 1rem;
+  }
+
+  .get-access-btn {
+    padding: 25px 35px;
+    font-size: 1.2rem;
+  }
+
+  .button-container {
+    bottom: 20px;
   }
 }
