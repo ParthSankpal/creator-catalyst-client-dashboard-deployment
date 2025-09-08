@@ -1,5 +1,10 @@
+"use client";
+import { useRouter } from "next/navigation";
+
 export default function ChallengeCard(props) {
+  const router = useRouter();
   const {
+    id, // make sure we pass id from the parent
     type,
     title,
     description,
@@ -16,11 +21,17 @@ export default function ChallengeCard(props) {
     status,
   } = props;
 
+  const handleClick = () => {
+    router.push(`/challenges/${id}`);
+  };
+
   return (
     <div
-      className={`rounded-2xl shadow-xl p-6 border-l-4 ${borderColor} transition 
+      onClick={handleClick}
+      className={`cursor-pointer rounded-2xl shadow-xl p-6 border-l-4 ${borderColor} transition 
         bg-white text-gray-900 shadow-gray-200/40
         dark:bg-[#222222] dark:text-gray-100 dark:shadow-gray-800
+        hover:shadow-2xl hover:scale-[1.02] duration-200
       `}
     >
       <div className="flex items-center justify-between mb-4">

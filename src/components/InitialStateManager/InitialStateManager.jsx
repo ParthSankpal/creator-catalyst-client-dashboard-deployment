@@ -35,6 +35,8 @@ const InitialStateManager = () => {
         const storedUser = getCookie("user");
 
         if (jwt) {
+          console.log(jwt);
+          
           addAuthHeaderToAxios(`Bearer ${jwt}`);
         }
 

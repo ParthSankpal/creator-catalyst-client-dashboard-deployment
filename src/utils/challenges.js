@@ -32,8 +32,7 @@ export const getTimeRemaining = (endDate) => {
 export const formatDuration = (startDate, endDate) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
-
-  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
   return `${days} days`;
 };
 
@@ -68,14 +67,48 @@ export const getChallengeColors = (status) => {
 };
 
 // 🔹 Category → Emoji mapping
-export const getEmojiForChallenge = (title, difficulty) => {
+export const getEmojiForChallenge = (title = "", difficulty = "") => {
   if (title.toLowerCase().includes("food")) return "🍕";
   if (title.toLowerCase().includes("history")) return "🏛️";
   if (title.toLowerCase().includes("tech")) return "💻";
   if (title.toLowerCase().includes("art")) return "🎨";
   if (title.toLowerCase().includes("culture")) return "🎭";
-  if (difficulty === "easy") return "🌱";
-  if (difficulty === "medium") return "⚡";
-  if (difficulty === "hard") return "🔥";
+  if (difficulty.toLowerCase() === "easy") return "🌱";
+  if (difficulty.toLowerCase() === "medium") return "⚡";
+  if (difficulty.toLowerCase() === "hard") return "🔥";
   return "🏆";
+};
+
+export const transformChallenges = (rawChallenges = []) => {
+  const categorized = { active: [], completed: [], upcoming: [] };
+
+  rawChallenges.forEach((c) => {
+    const status = getChallengeStatus(c);
+    const colors = getChallengeColors(status);
+    const emoji = getEmojiForChallenge(c.challenge_title, c.difficulty_level);
+
+    categorized[status].push({
+      id: c.id,
+      type: status, 
+      title: c.challenge_title,
+      description: c.description,
+      reward: `${c.reward_points} pts`,
+      participants: c.participants || Math.floor(Math.random() * 1000),
+      rank: c.rank || "#7",
+      points: c.points || `${c.reward_points} pts`,
+      expectedReward: `${c.reward_points} pts`,
+      duration: formatDuration(c.start_date, c.end_date),
+      timeLeft: status === "active" ? getTimeRemaining(c.end_date) : null,
+      status:
+        status === "completed"
+          ? "Completed"
+          : status === "upcoming"
+          ? "Starts Soon"
+          : "Ongoing",
+      emoji,
+      ...colors,
+    });
+  });
+
+  return categorized;
 };
