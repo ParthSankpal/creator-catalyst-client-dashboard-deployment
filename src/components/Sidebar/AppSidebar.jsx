@@ -39,21 +39,13 @@ export default function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r ">
       {/* Logo / Header */}
       <SidebarHeader className="flex items-center justify-center py-4">
-        <Image
-          src="/logo.svg"
-          alt="Company Logo"
-          width={40}
-          height={40}
-          className="rounded-md"
-        />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className={`sidebaricons`}>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
             {navigation.map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild isActive={isActive}>
@@ -61,9 +53,11 @@ export default function AppSidebar() {
                       href={item.href}
                       className={`
                         flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                        ${isActive
-                          ? "bg-accent text-accent-foreground shadow-sm"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"}
+                        ${
+                          isActive
+                            ? "bg-accent text-accent-foreground shadow-sm"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        }
                       `}
                     >
                       <item.icon className=" size-6 shrink-0" />
@@ -71,11 +65,11 @@ export default function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              )
+              );
             })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
