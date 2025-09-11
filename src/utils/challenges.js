@@ -80,16 +80,20 @@ export const getEmojiForChallenge = (title = "", difficulty = "") => {
 };
 
 export const transformChallenges = (rawChallenges = []) => {
-  const categorized = { active: [], completed: [], upcoming: [] };
+  const categorized = {
+    active: { enrolled: [], others: [] },
+    upcoming: { enrolled: [], others: [] },
+    completed: { enrolled: [], others: [] },
+  };
 
   rawChallenges.forEach((c) => {
     const status = getChallengeStatus(c);
     const colors = getChallengeColors(status);
     const emoji = getEmojiForChallenge(c.challenge_title, c.difficulty_level);
 
-    categorized[status].push({
-      id: c.id,
-      type: status, 
+    const challengeData = {
+      challenge_id: c.challenge_id,
+      type: status,
       title: c.challenge_title,
       description: c.description,
       reward: `${c.reward_points} pts`,
@@ -107,8 +111,16 @@ export const transformChallenges = (rawChallenges = []) => {
           : "Ongoing",
       emoji,
       ...colors,
-    });
+      enrolled: !!c.progress_id, // 🔹 true if enrolled
+    };
+
+    if (challengeData.enrolled) {
+      categorized[status].enrolled.push(challengeData);
+    } else {
+      categorized[status].others.push(challengeData);
+    }
   });
 
   return categorized;
 };
+

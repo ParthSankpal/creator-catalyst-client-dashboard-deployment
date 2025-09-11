@@ -5,11 +5,14 @@ import { transformChallenges } from "../../../utils/challenges";
 import ChallengeCard from "../ChallengeCard/ChallengeCard";
 import Tabs from "../../Tabs/Tabs";
 
+
+
+
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState({
-    active: [],
-    upcoming: [],
-    completed: [],
+    active: { enrolled: [], others: [] },
+    upcoming: { enrolled: [], others: [] },
+    completed: { enrolled: [], others: [] },
   });
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("active");
@@ -35,6 +38,19 @@ export default function ChallengesPage() {
     { value: "completed", label: "Completed" },
   ];
 
+  const renderChallengeSection = (title, list) => (
+    list.length > 0 && (
+      <>
+        <h2 className="text-xl font-semibold mt-6 mb-3">{title}</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {list.map((c, index) => (
+            <ChallengeCard key={c.challenge_id || index} id={c.challenge_id} {...c} />
+          ))}
+        </div>
+      </>
+    )
+  );
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">🚀 Challenges</h1>
@@ -45,16 +61,16 @@ export default function ChallengesPage() {
       {/* Content */}
       {loading ? (
         <p>Loading challenges...</p>
-      ) : challenges[tab].length === 0 ? (
+      ) : challenges[tab].enrolled.length === 0 &&
+        challenges[tab].others.length === 0 ? (
         <p className="text-gray-500">No {tab} challenges.</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {challenges[tab].map((c) => (
-            <ChallengeCard key={c.id} id={c.id} {...c} />
-          ))}
-
-        </div>
+        <>
+          {renderChallengeSection("✅ Enrolled Challenges", challenges[tab].enrolled)}
+          {renderChallengeSection("📌 Other Challenges", challenges[tab].others)}
+        </>
       )}
     </div>
   );
 }
+

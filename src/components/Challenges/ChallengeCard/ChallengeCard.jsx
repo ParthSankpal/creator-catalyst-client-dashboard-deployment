@@ -2,9 +2,12 @@
 import { useRouter } from "next/navigation";
 
 export default function ChallengeCard(props) {
+
+  console.log(props);
+  
   const router = useRouter();
   const {
-    id, // make sure we pass id from the parent
+    challenge_id, 
     type,
     title,
     description,
@@ -22,7 +25,7 @@ export default function ChallengeCard(props) {
   } = props;
 
   const handleClick = () => {
-    router.push(`/challenges/${id}`);
+    router.push(`/challenges/${challenge_id}`);
   };
 
   return (

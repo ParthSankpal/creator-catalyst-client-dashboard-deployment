@@ -1,6 +1,9 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 const ModuleCard = ({
+  id,
   icon,
   title,
   description,
@@ -11,17 +14,41 @@ const ModuleCard = ({
   unlocked,
   unlocksAt
 }) => {
+  const router = useRouter();
+
+  const handleRedirect = () => {
+    router.push(`/modules/${id}`);
+  };
+
   return (
-    <article className={`bg-white dark:bg-[#222222] rounded-xl shadow-xl p-6 border-l-3 ${unlocked ? (inProgress ? "border-emerald-500" : "border-emerald-600") : "border-gray-300"} flex flex-col`}>
+    <article
+      className={`bg-white dark:bg-[#222222] rounded-xl shadow-xl p-6 border-l-3 ${
+        unlocked
+          ? inProgress
+            ? "border-emerald-500"
+            : "border-emerald-600"
+          : "border-gray-300"
+      } flex flex-col`}
+    >
       <div className="flex items-center justify-between mb-4">
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${unlocked ? (inProgress ? "bg-emerald-100 text-emerald-800" : "bg-emerald-600 text-white") : "bg-gray-200 text-gray-500"}`}>
+        <span
+          className={`text-xs font-medium px-2 py-1 rounded-full ${
+            unlocked
+              ? inProgress
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-emerald-600 text-white"
+              : "bg-gray-200 text-gray-500"
+          }`}
+        >
           {unlocked ? (inProgress ? "In Progress" : "Completed") : "Locked"}
         </span>
         <span>{icon}</span>
       </div>
 
       <div className="flex flex-col gap-2">
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+          {title}
+        </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
       </div>
 
@@ -45,13 +72,19 @@ const ModuleCard = ({
       </div>
 
       {unlocked && !inProgress && (
-        <button className="mt-4 px-4 py-2 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-700 hover:text-emerald-100 transition w-full">
+        <button
+          onClick={handleRedirect}
+          className="mt-4 px-4 py-2 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-700 hover:text-emerald-100 transition w-full"
+        >
           Review Materials
         </button>
       )}
 
       {unlocked && inProgress && (
-        <button className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition w-full">
+        <button
+          onClick={handleRedirect}
+          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition w-full"
+        >
           Continue Module
         </button>
       )}

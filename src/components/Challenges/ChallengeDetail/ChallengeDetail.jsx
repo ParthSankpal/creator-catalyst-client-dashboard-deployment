@@ -25,6 +25,7 @@ export default function ChallengeDetail() {
       try {
         const res = await getChallengeById(id);
         const c = res?.data;
+console.log(c);
 
         if (c) {
           const status = getChallengeStatus(c);
@@ -54,23 +55,35 @@ export default function ChallengeDetail() {
     fetchChallenge();
   }, [id]);
 
-  const handleStart = async () => {
-    try {
-      setSubmitting(true);
-      await startChallenge(id);
-      alert("Challenge started! 🚀");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to start challenge.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+ const handleStart = async () => {
+  try {
+    setSubmitting(true);
+    const response = await startChallenge(id); 
+    console.log("Start challenge response:", response.data);
+
+    alert("Challenge started! 🚀");
+    return response; 
+  } catch (err) {
+    // Check if error response exists
+    const errorMessage =
+      err?.response?.data?.message || 
+      err?.message ||                 
+      "Something went wrong.";
+
+    console.error("Error starting challenge:", errorMessage, err);
+    alert(`Failed to start challenge: ${errorMessage}`);
+
+    throw err; 
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      // example payload: attach submission data here
+      
       const payload = { answer: "My submission..." };
       await submitChallenge(id, payload);
       alert("Challenge submitted ✅");

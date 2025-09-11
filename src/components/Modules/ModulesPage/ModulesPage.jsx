@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import ProgressCard from "./ProgressCard";
-import ModuleCard from "./ModuleCard";
-import { transformModulesData, calculateProgress } from "../../utils/modules";
-import { getCreatorModules } from "../../api/modules";
+import ProgressCard from "../ProgressCard";
+import ModuleCard from "../ModuleCard/ModuleCard";
+import { transformModulesData, calculateProgress } from "../../../utils/modules";
+import { getCreatorModules } from "../../../api/modules";
 
 const ModulesPage = () => {
   const [modules, setModules] = useState([]);

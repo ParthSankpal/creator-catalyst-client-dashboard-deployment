@@ -1,4 +1,4 @@
-import ModulesPage from '../../../components/Modules/ModulesPage';
+import ModulesPage from '../../../components/Modules/ModulesPage/ModulesPage';
 import React from 'react'
 
 const Modules = () => {
