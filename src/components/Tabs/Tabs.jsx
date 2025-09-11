@@ -1,30 +1,28 @@
-// components/Tabs/Tabs.js
+
+import { cn } from "@/lib/utils"
+
 export default function Tabs({ tabs, activeTab, onChange }) {
   return (
     <div className="mb-6">
-      <div
-        className={`
-          flex space-x-1 rounded-lg p-1 w-fit 
-          bg-gray-100 dark:bg-[#222222]
-        `}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            onClick={() => onChange(tab.value)}
-            className={`
-              px-4 py-2 text-sm font-medium rounded-md transition
-              ${
-                activeTab === tab.value
-                  ? "bg-white shadow text-gray-900 dark:bg-[#3f3f3f] dark:text-white"
-                  : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-              }
-            `}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="inline-flex items-center rounded-md border bg-background p-1 shadow-sm">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.value
+          return (
+            <button
+              key={tab.value}
+              onClick={() => onChange(tab.value)}
+              className={cn(
+                "relative inline-flex items-center rounded-sm px-4 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-accent text-accent-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
     </div>
-  );
+  )
 }

@@ -1,31 +1,27 @@
-"use client";
 
-import { useState } from "react";
-import Navbar from "../Navbar/Navbar";
-import Sidebar from "../Sidebar/Sidebar";
 
-const MainSection = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import Navbar from "../Navbar/Navbar"
+import AppSidebar from "../Sidebar/AppSidebar"
 
+export default function MainSection({ children }) {
   return (
-    <div className="min-h-screen flex flex-col  transition-colors duration-300">
-      <Navbar />
-
-      <div className="flex flex-1">
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background text-foreground">
         {/* Sidebar */}
-        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <AppSidebar />
 
-        {/* Main content */}
-        <main
-          className={`flex-1 p-6 transition-all duration-300 ${
-            collapsed ? "md:ml-20" : "md:ml-64"
-          }  bg-white dark:bg-black/10 text-black dark:text-white `}
-        >
-          {children}
-        </main>
+        {/* Inset wraps Navbar + Content */}
+        <SidebarInset className="flex flex-col flex-1 w-full">
+          {/* Navbar full width */}
+          <Navbar />
+
+          {/* Main content area expands correctly */}
+          <main className="flex-1 w-full p-6 overflow-y-auto">
+            {children}
+          </main>
+        </SidebarInset>
       </div>
-    </div>
-  );
-};
-
-export default MainSection;
+    </SidebarProvider>
+  )
+}

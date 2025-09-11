@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { Button } from "@/components/ui/button";
+import { Sun, Moon, Laptop } from "lucide-react";
 
-const THEME_KEY = "theme_preference"; // cookie key
-const themes = ["light", "dark", "system"]; // cycle order
+const THEME_KEY = "theme_preference";
+const themes = ["light", "dark", "system"];
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState("system");
 
-  // Apply theme to document
   const applyTheme = (mode) => {
     if (mode === "system") {
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -20,12 +21,10 @@ export default function ThemeToggle() {
   };
 
   useEffect(() => {
-    // Load theme from cookie
     const savedTheme = Cookies.get(THEME_KEY) || "system";
     setTheme(savedTheme);
     applyTheme(savedTheme);
 
-    // Listen to system changes if theme is 'system'
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e) => {
       if (Cookies.get(THEME_KEY) === "system") {
@@ -33,7 +32,6 @@ export default function ThemeToggle() {
       }
     };
     mediaQuery.addEventListener("change", handleChange);
-
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
@@ -45,18 +43,16 @@ export default function ThemeToggle() {
     applyTheme(nextTheme);
   };
 
-  const getButtonLabel = () => {
-    if (theme === "light") return "☀️ Light";
-    if (theme === "dark") return "🌙 Dark";
-    return "💻 System"; 
+  const renderIcon = () => {
+    if (theme === "light") return <Sun className="h-4 w-4" />;
+    if (theme === "dark") return <Moon className="h-4 w-4" />;
+    return <Laptop className="h-4 w-4" />;
   };
 
   return (
-    <button
-      onClick={toggleTheme}
-      className="px-3 py-2 rounded-md border bg-background text-foreground hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-    >
-      {getButtonLabel()}
-    </button>
+    <Button variant="outline" size="sm" onClick={toggleTheme}>
+      {renderIcon()}
+      <span className="ml-2 capitalize">{theme}</span>
+    </Button>
   );
 }

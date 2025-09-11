@@ -1,18 +1,18 @@
 "use client";
+
 import { useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function ChallengeCard(props) {
-
-  console.log(props);
-  
   const router = useRouter();
   const {
-    challenge_id, 
+    challenge_id,
     type,
     title,
     description,
     emoji,
-    borderColor,
     badgeColor,
     timeLeft,
     reward,
@@ -29,102 +29,88 @@ export default function ChallengeCard(props) {
   };
 
   return (
-    <div
+    <Card
       onClick={handleClick}
-      className={`cursor-pointer rounded-2xl shadow-xl p-6 border-l-4 ${borderColor} transition 
-        bg-white text-gray-900 shadow-gray-200/40
-        dark:bg-[#222222] dark:text-gray-100 dark:shadow-gray-800
-        hover:shadow-2xl hover:scale-[1.02] duration-200
-      `}
+      className="cursor-pointer transition hover:shadow-lg hover:scale-[1.02] duration-200"
     >
-      <div className="flex items-center justify-between mb-4">
+      <CardHeader className="flex flex-row items-center justify-between">
         {(type === "active" || type === "completed" || type === "upcoming") && (
-          <span
-            className={`px-3 py-1 ${badgeColor} text-xs font-medium rounded-full`}
+          <Badge
+            className={`text-xs font-medium ${badgeColor}`}
+            variant="secondary"
           >
             {timeLeft || status}
-          </span>
+          </Badge>
         )}
         <span className="text-2xl">{emoji}</span>
-      </div>
+      </CardHeader>
 
-      <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
-        {title}
-      </h3>
-      <p className="text-sm mb-4 text-gray-600 dark:text-gray-400">
-        {description}
-      </p>
+      <CardContent>
+        <CardTitle className="text-lg font-semibold mb-1">{title}</CardTitle>
+        <CardDescription className="mb-4">{description}</CardDescription>
 
-      {/* Active */}
-      {type === "active" && (
-        <>
+        {/* Active */}
+        {type === "active" && (
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">
-                Participants
-              </span>
+              <span className="text-muted-foreground">Participants</span>
               <span className="font-medium">{participants}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Reward</span>
+              <span className="text-muted-foreground">Reward</span>
               <span className="font-medium text-emerald-600">{reward}</span>
             </div>
           </div>
-          <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition">
-            Submit Entry
-          </button>
-        </>
-      )}
+        )}
 
-      {/* Completed */}
-      {type === "completed" && (
-        <>
+        {/* Completed */}
+        {type === "completed" && (
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Your Rank</span>
+              <span className="text-muted-foreground">Your Rank</span>
               <span className="font-medium text-green-600">{rank}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">
-                Points Earned
-              </span>
+              <span className="text-muted-foreground">Points Earned</span>
               <span className="font-medium text-green-600">{points}</span>
             </div>
           </div>
-          <button
-            className="w-full bg-gray-300 text-gray-700 py-2 rounded-lg font-medium cursor-not-allowed 
-                       dark:bg-[#3f3f3f] dark:text-gray-400"
-          >
-            Challenge Ended
-          </button>
-        </>
-      )}
+        )}
 
-      {/* Upcoming */}
-      {type === "upcoming" && (
-        <>
+        {/* Upcoming */}
+        {type === "upcoming" && (
           <div className="space-y-2 mb-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">
-                Expected Reward
-              </span>
+              <span className="text-muted-foreground">Expected Reward</span>
               <span className="font-medium text-purple-600">
                 {expectedReward}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Duration</span>
+              <span className="text-muted-foreground">Duration</span>
               <span className="font-medium">{duration}</span>
             </div>
           </div>
-          <button
-            className="w-full bg-gray-300 text-gray-500 py-2 rounded-lg font-medium cursor-not-allowed 
-                       dark:bg-[#3f3f3f] dark:text-gray-400"
-          >
+        )}
+      </CardContent>
+
+      <CardFooter>
+        {type === "active" && (
+          <Button className="w-full" variant="default">
+            Submit Entry
+          </Button>
+        )}
+        {type === "completed" && (
+          <Button className="w-full" variant="secondary" disabled>
+            Challenge Ended
+          </Button>
+        )}
+        {type === "upcoming" && (
+          <Button className="w-full" variant="secondary" disabled>
             Coming Soon
-          </button>
-        </>
-      )}
-    </div>
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }
