@@ -14,7 +14,6 @@ export default function LoginPage() {
 
   return (
     <main className="h-screen w-screen flex flex-col relative overflow-hidden">
-      {/* Main gradient background from #68B8FF (bottom) to #FFFFFF (top) */}
       <div
         className="absolute inset-0"
         style={{
@@ -22,11 +21,9 @@ export default function LoginPage() {
         }}
       ></div>
 
-      {/* Additional subtle overlay gradients for depth */}
       <div className="absolute inset-0 bg-gradient-to-tr from-sky-50/30 via-transparent to-white/20 opacity-60"></div>
       <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-white/10 to-sky-100/20 opacity-40"></div>
 
-      {/* Enhanced noise texture overlay */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -35,7 +32,6 @@ export default function LoginPage() {
         }}
       ></div>
 
-      {/* Additional fine grain noise for texture */}
       <div
         className="absolute inset-0 opacity-20"
         style={{
@@ -44,11 +40,9 @@ export default function LoginPage() {
         }}
       ></div>
 
-      {/* Main Content Container - grows to fill space above footer */}
       <div className=" mt-20 sm:mt-50 relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6">
         <div className="relative z-1000 w-full max-w-md mx-auto">
           <div className="bg-none rounded-3xl p-6 sm:p-8 flex flex-col justify-center align-middle">
-            {/* Google Sign-In Button */}
             <button
               type="button"
               onClick={() => startGoogle()}
@@ -59,7 +53,7 @@ export default function LoginPage() {
               }}
             >
               <img
-                src="https://www.svgrepo.com/show/503367/google.svg"
+                src="/google.svg"
                 alt="Google"
                 className="h-5 w-5 sm:h-6 sm:w-6"
               />
