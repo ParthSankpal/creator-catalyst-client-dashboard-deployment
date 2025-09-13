@@ -45,7 +45,7 @@ export default function Home() {
       </nav>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6">
-        <h1 className="text-3xl sm:text-5xl font-semibold text-gray-800 mb-6 mt-20">
+        <h1 className="text-3xl sm:text-5xl font-medium text-gray-600 mb-6 mt-20">
           Track all your progress and <br/>learn from modules
         </h1>
 
