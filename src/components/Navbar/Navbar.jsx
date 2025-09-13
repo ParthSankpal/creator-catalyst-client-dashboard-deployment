@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { Bell, ChevronDown, LogOut, User } from "lucide-react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import ThemeToggle from "../ThemeToggle/ThemeToggle"
+// import ThemeToggle from "../ThemeToggle/ThemeToggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +45,7 @@ export default function Navbar() {
 
         {/* Right section */}
         <div className="flex items-center gap-4">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <button className="p-2 rounded-md text-gray-500 hover:text-foreground">
             <Bell className="h-5 w-5" />
