@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Notifications Handler</title>
+</head>
+
+<body>
+    <h1>Firebase Notifications Demo</h1>
+    <div id="notification-area">
+        <h3>Received Notifications:</h3>
+        <div id="notifications"></div>
+    </div>
+
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-messaging.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDu6nj4nGi9IDuNWsPNZOsNVhtDltSyGHY",
+            authDomain: "connectpingnetwork.firebaseapp.com",
+            projectId: "connectpingnetwork",
+            storageBucket: "connectpingnetwork.firebasestorage.app",
+            messagingSenderId: "29028461956",
+            appId: "1:29028461956:web:cfb871c328aefc2a0241d1",
+            measurementId: "G-CRTXGHZ2VP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // Function to display notifications in the UI
+        function displayNotification(title, body, data = null) {
+            const notificationsDiv = document.getElementById('notifications');
+            const notificationElement = document.createElement('div');
+            notificationElement.style.cssText = `
+                border: 1px solid #ccc;
+                padding: 10px;
+                margin: 10px 0;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+            `;
+
+            const timestamp = new Date().toLocaleString();
+            notificationElement.innerHTML = `
+                <strong>${title}</strong><br>
+                <span>${body}</span><br>
+                <small style="color: #666;">${timestamp}</small>
+                ${data ? `<br><small style="color: #999;">Data: ${JSON.stringify(data)}</small>` : ''}
+            `;
+
+            notificationsDiv.insertBefore(notificationElement, notificationsDiv.firstChild);
+        }
+
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+            console.log('Message received in foreground: ', payload);
+
+            const { notification, data } = payload;
+
+            // Display notification in UI
+            if (notification) {
+                displayNotification(
+                    notification.title || 'New Message',
+                    notification.body || 'You have a new notification',
+                    data
+                );
+
+                // Show browser notification if permission is granted
+                if (Notification.permission === 'granted') {
+                    const browserNotification = new Notification(notification.title || 'New Message', {
+                        body: notification.body || 'You have a new notification',
+                        icon: notification.icon || '/firebase-logo.png',
+                        badge: '/firebase-logo.png',
+                        tag: 'firebase-notification',
+                        requireInteraction: true,
+                        data: data
+                    });
+
+                    // Handle notification click
+                    browserNotification.onclick = function (event) {
+                        event.preventDefault();
+                        window.focus();
+                        browserNotification.close();
+
+                        // Handle any custom click action based on data
+                        if (data && data.click_action) {
+                            window.open(data.click_action, '_blank');
+                        }
+                    };
+                }
+            } else if (data) {
+                // Handle data-only messages
+                displayNotification(
+                    'Data Message Received',
+                    'Received data-only message',
+                    data
+                );
+            }
+        });
+
+        // Initialize notifications
+        async function initializeNotifications() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Register service worker
+                    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    console.log('Service Worker registered successfully:', registration);
+
+                    // Request notification permission
+                    const permission = await Notification.requestPermission();
+                    
+                    if (permission === "granted") {
+                        console.log("Notification permission granted.");
+
+                        // Get FCM token
+                        const token = await getToken(messaging, {
+                            vapidKey: "BJi5vY-cNpiiiVwddAGNWn2EvopHCTZu1WOREQWgg1XIIV71WAC5YSvYCb2OpE_iyui8OwJY2zW1T0zQqSfeUC0",
+                            serviceWorkerRegistration: registration
+                        });
+
+                        if (token) {
+                            console.log("FCM Token:", token);
+
+                            // Display token in UI for testing
+                            const tokenDisplay = document.createElement('div');
+                            tokenDisplay.style.cssText = `
+                                margin: 20px 0;
+                                padding: 10px;
+                                background-color: #e8f5e8;
+                                border-radius: 5px;
+                                word-break: break-all;
+                            `;
+                            tokenDisplay.innerHTML = `<strong>FCM Token:</strong><br><small>${token}</small>`;
+                            document.body.appendChild(tokenDisplay);
+
+                            // Send token to your backend (uncomment and modify as needed)
+                            // fetch('/save_token.php', {
+                            //     method: 'POST',
+                            //     headers: { 'Content-Type': 'application/json' },
+                            //     body: JSON.stringify({ token: token })
+                            // });
+                        } else {
+                            console.log("No registration token available.");
+                        }
+                    } else {
+                        throw new Error("Notifications not granted by user.");
+                    }
+                } catch (err) {
+                    console.log("An error occurred while setting up notifications:", err);
+                }
+            } else {
+                console.log("Service workers are not supported in this browser.");
+            }
+        }
+
+        // Call the initialization function
+        initializeNotifications();
+    </script>
+</body>
+
+</html>

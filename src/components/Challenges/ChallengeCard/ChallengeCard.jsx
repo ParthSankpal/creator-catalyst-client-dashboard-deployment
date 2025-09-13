@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -22,17 +29,19 @@ export default function ChallengeCard(props) {
     expectedReward,
     duration,
     status,
+
+    // 🔹 progress + submissions
+    progress_started_at,
+    progress_updated_at,
+    submissions,
   } = props;
 
-  const handleClick = () => {
+  const handleView = () => {
     router.push(`/challenges/${challenge_id}`);
   };
 
   return (
-    <Card
-      onClick={handleClick}
-      className="cursor-pointer transition hover:shadow-lg hover:scale-[1.02] duration-200"
-    >
+    <Card className="transition hover:shadow-lg hover:scale-[1.02] duration-200">
       <CardHeader className="flex flex-row items-center justify-between">
         {(type === "active" || type === "completed" || type === "upcoming") && (
           <Badge
@@ -94,21 +103,63 @@ export default function ChallengeCard(props) {
         )}
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex gap-2">
+        {/* 🔹 Active */}
         {type === "active" && (
-          <Button className="w-full" variant="default">
-            Submit Entry
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              className="flex-1 cursor-pointer"
+              onClick={handleView}
+            >
+              View
+            </Button>
+
+            {(progress_started_at ||
+              progress_updated_at ||
+              submissions?.length > 0) && (
+              <Button className="flex-1 cursor-pointer">
+                {submissions?.length > 0
+                  ? "Add Another Submission"
+                  : "Submit Entry"}
+              </Button>
+            )}
+          </>
         )}
+
+        {/* 🔹 Completed */}
         {type === "completed" && (
-          <Button className="w-full" variant="secondary" disabled>
-            Challenge Ended
-          </Button>
+          <>
+            {submissions?.length > 0 ? (
+              <Button
+                variant="secondary"
+                className="flex-1 cursor-pointer"
+                onClick={handleView}
+              >
+                View Submissions
+              </Button>
+            ) : (
+              <Button className="flex-1" variant="secondary" disabled>
+                Challenge Missed
+              </Button>
+            )}
+          </>
         )}
+
+        {/* 🔹 Upcoming */}
         {type === "upcoming" && (
-          <Button className="w-full" variant="secondary" disabled>
-            Coming Soon
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              className="flex-1 cursor-pointer"
+              onClick={handleView}
+            >
+              View
+            </Button>
+            <Button className="flex-1" variant="secondary" disabled>
+              Coming Soon
+            </Button>
+          </>
         )}
       </CardFooter>
     </Card>

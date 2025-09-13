@@ -19,11 +19,22 @@ export const startChallenge = async (id) => {
   return res.data;
 };
 
-// ✅ Submit a challenge
-export const submitChallenge = async (id, payload) => {
-  const res = await axiosClient.post(`/api/challengeSubmit/${id}`, payload);
-  return res.data;
+export const submitChallenge = (id, payload) => {
+  // // Convert object to URLSearchParams for x-www-form-urlencoded
+  // const payload = new URLSearchParams();
+  // Object.keys(formData).forEach((key) => {
+  //   if (formData[key] !== undefined && formData[key] !== null) {
+  //     payload.append(key, formData[key]);
+  //   }
+  // });
+
+  return axiosClient.post(`/api/challengeSubmit/${id}`, payload, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
 };
+
 
 // ✅ Get all submissions of a challenge (for creator)
 export const getCreatorChallengeSubmissions = async (id) => {

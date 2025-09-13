@@ -1,6 +1,6 @@
 // utils/challenges.js
 
-// 🔹 Determine status
+// 🔹 Determine status from dates
 export const getChallengeStatus = (challenge) => {
   const now = new Date();
   const start = new Date(challenge.start_date);
@@ -57,6 +57,12 @@ export const getChallengeColors = (status) => {
         badgeColor:
           "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200",
       };
+    case "missed":
+      return {
+        borderColor: "border-red-500",
+        badgeColor:
+          "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200",
+      };
     default:
       return {
         borderColor: "border-gray-500",
@@ -79,6 +85,7 @@ export const getEmojiForChallenge = (title = "", difficulty = "") => {
   return "🏆";
 };
 
+// 🔹 Transform API response
 export const transformChallenges = (rawChallenges = []) => {
   const categorized = {
     active: { enrolled: [], others: [] },
@@ -87,31 +94,59 @@ export const transformChallenges = (rawChallenges = []) => {
   };
 
   rawChallenges.forEach((c) => {
-    const status = getChallengeStatus(c);
-    const colors = getChallengeColors(status);
-    const emoji = getEmojiForChallenge(c.challenge_title, c.difficulty_level);
+    let status = getChallengeStatus(c);
+    const hasSubmission = c.submissions && c.submissions.length > 0;
+
+    // ✅ If submissions exist → always mark as completed
+    if (hasSubmission) {
+      status = "completed";
+      c.completionStatus = "completed";
+    } else if (status === "completed") {
+      // ❌ Ended but no submission → missed
+      c.completionStatus = "missed";
+    }
+
+    // 🎨 Assign colors
+    const colors =
+      c.completionStatus === "missed"
+        ? getChallengeColors("missed")
+        : getChallengeColors(status);
+
+    const emoji = getEmojiForChallenge(
+      c.challenge_title,
+      c.difficulty_level
+    );
 
     const challengeData = {
       challenge_id: c.challenge_id,
-      type: status,
+      type: status, // active | upcoming | completed
       title: c.challenge_title,
       description: c.description,
       reward: `${c.reward_points} pts`,
       participants: c.participants || Math.floor(Math.random() * 1000),
       rank: c.rank || "#7",
-      points: c.points || `${c.reward_points} pts`,
+      points: c.points_earned || 0,
       expectedReward: `${c.reward_points} pts`,
       duration: formatDuration(c.start_date, c.end_date),
       timeLeft: status === "active" ? getTimeRemaining(c.end_date) : null,
       status:
-        status === "completed"
+        hasSubmission
           ? "Completed"
+          : c.completionStatus === "missed"
+          ? "Not Completed"
           : status === "upcoming"
           ? "Starts Soon"
           : "Ongoing",
       emoji,
       ...colors,
-      enrolled: !!c.progress_id, // 🔹 true if enrolled
+      enrolled: !!c.progress_id,
+
+      // 🔹 Add progress + submissions
+      progress_started_at: c.progress_started_at,
+      progress_updated_at: c.progress_updated_at,
+      progress_completed_at: c.progress_completed_at,
+      points_earned: c.points_earned,
+      submissions: c.submissions || [],
     };
 
     if (challengeData.enrolled) {
@@ -123,4 +158,3 @@ export const transformChallenges = (rawChallenges = []) => {
 
   return categorized;
 };
-

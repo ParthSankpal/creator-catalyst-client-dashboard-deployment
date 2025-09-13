@@ -41,7 +41,7 @@ export default function AppSidebar() {
       <SidebarHeader className="flex items-center justify-center py-4">
       </SidebarHeader>
 
-      <SidebarContent className={`sidebaricons`}>
+      <SidebarContent className={`sidebaricons flex-none items-start`}>
         <SidebarGroup>
           <SidebarMenu>
             {navigation.map((item) => {

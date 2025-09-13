@@ -4,9 +4,7 @@ import { getChallenges } from "../../../api/challenges";
 import { transformChallenges } from "../../../utils/challenges";
 import ChallengeCard from "../ChallengeCard/ChallengeCard";
 import Tabs from "../../Tabs/Tabs";
-
-
-
+import Loader from "../../Loader/Loader";
 
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState({
@@ -38,18 +36,21 @@ export default function ChallengesPage() {
     { value: "completed", label: "Completed" },
   ];
 
-  const renderChallengeSection = (title, list) => (
+  const renderChallengeSection = (title, list, type) =>
     list.length > 0 && (
       <>
         <h2 className="text-xl font-semibold mt-6 mb-3">{title}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {list.map((c, index) => (
-            <ChallengeCard key={c.challenge_id || index} id={c.challenge_id} {...c} />
+            <ChallengeCard
+              key={c.challenge_id || index}
+              type={type}
+              {...c}
+            />
           ))}
         </div>
       </>
-    )
-  );
+    );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -60,17 +61,24 @@ export default function ChallengesPage() {
 
       {/* Content */}
       {loading ? (
-        <p>Loading challenges...</p>
+        <div><Loader /></div>
       ) : challenges[tab].enrolled.length === 0 &&
         challenges[tab].others.length === 0 ? (
         <p className="text-gray-500">No {tab} challenges.</p>
       ) : (
         <>
-          {renderChallengeSection("✅ Enrolled Challenges", challenges[tab].enrolled)}
-          {renderChallengeSection("📌 Other Challenges", challenges[tab].others)}
+          {renderChallengeSection(
+            "✅ Enrolled Challenges",
+            challenges[tab].enrolled,
+            tab
+          )}
+          {renderChallengeSection(
+            "📌 Other Challenges",
+            challenges[tab].others,
+            tab
+          )}
         </>
       )}
     </div>
   );
 }
-

@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -9,24 +8,43 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react"
 
-export default function SubmitChallengeModal({ location, onSubmit }) {
-  const [open, setOpen] = useState(true) // 👈 keep it open
+export default function SubmitChallengeModal({
+  open,
+  onClose,
+  location,
+  onSubmit,
+  loading,
+  hashTags = "", // 👈 pass default hashtags from challenge
+}) {
   const [formData, setFormData] = useState({
     submission: "",
-    hashtags: "",
+    hashtags: hashTags || "", // pre-fill hashtags
     city: location || "",
   })
 
+  // Sync hashtags if challenge changes
+  useEffect(() => {
+    if (hashTags) {
+      setFormData((prev) => ({ ...prev, hashtags: hashTags }))
+    }
+  }, [hashTags])
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSubmit(formData)
-    setOpen(false) // close after submit
+
+    // Normalize hashtags into string with commas
+    const payload = {
+      ...formData,
+      hashtags: formData.hashtags.trim(),
+    }
+
+    onSubmit(payload)
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {/* we skip <DialogTrigger> so it always shows */}
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Submit Your Challenge</DialogTitle>
@@ -41,23 +59,32 @@ export default function SubmitChallengeModal({ location, onSubmit }) {
             }
             required
           />
-          <Input
-            placeholder="#challenge #fun"
-            value={formData.hashtags}
-            onChange={(e) =>
-              setFormData({ ...formData, hashtags: e.target.value })
-            }
-          />
+
+          <div className="space-y-1">
+            <Input
+              placeholder="#challenge #fun"
+              value={formData.hashtags}
+              onChange={(e) =>
+                setFormData({ ...formData, hashtags: e.target.value })
+              }
+            />
+            <p className="text-xs text-gray-500">
+              You can add your own hashtags (separate with commas or spaces).
+            </p>
+          </div>
+
           <Input
             value={formData.city}
             readOnly
             className="bg-muted cursor-not-allowed"
           />
+
           <Button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white"
+            disabled={loading}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </Button>
         </form>
       </DialogContent>

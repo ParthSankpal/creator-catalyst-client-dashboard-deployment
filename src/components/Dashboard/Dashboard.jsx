@@ -1,88 +1,293 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
-
-import ProgressCard from "./ProgressCard";
-import ChallengeCard from "./ChallengeCard";
-import ModuleCard from "./ModuleCard";
-import BadgesCard from "./BadgesCard";
-import QuickStatsCard from "./QuickStatsCard";
-import UpcomingCard from "./UpcomingCard";
-
-/* Dummy Data */
-const progressData = {
-  submissions: { count: 5, total: 12, percent: 42 },
-  points: { current: 260, weekly: 45 },
-  rank: { current: 18, city: "Delhi", movement: "+3" },
-};
-
-const challengeData = {
-  title: "Delhi Street Food Spots",
-  description:
-    "Showcase the hidden gems and popular street food locations in Delhi. Focus on authenticity, taste, and the local experience.",
-  deadline: "Jan 20, 2025",
-  points: 50,
-  daysLeft: 2,
-};
-
-const moduleData = {
-  week: 3,
-  title: "Editing & Tools",
-  description:
-    "Master video editing techniques and learn about essential tools for creating engaging short-form content.",
-  actions: ["Watch Video 🎥", "Download PDF 📄", "Mark Complete ✓"],
-};
-
-const badgesData = [
-  { icon: "🏆", label: "First Upload", unlocked: true },
-  { icon: "🎬", label: "Video Creator", unlocked: true },
-  { icon: "📈", label: "Trending", unlocked: true },
-  { icon: "⭐", label: "Top Creator", unlocked: false },
-  { icon: "🔥", label: "Viral Hit", unlocked: false },
-];
-
-const quickStatsData = [
-  { label: "Views this week", value: "12.5K" },
-  { label: "Likes received", value: "834" },
-  { label: "Comments", value: "127" },
-  { label: "Completion rate", value: "85%", highlight: true },
-];
-
-const upcomingData = [
-  { color: "red", title: "Challenge submission", time: "Due in 2 days" },
-  { color: "yellow", title: "Week 4 module", time: "Starts Jan 22" },
-];
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { getCreatorRewards } from "@/src/api/dashboard";
+import { getCreatorModules } from "@/src/api/modules";
+import { getChallenges } from "@/src/api/challenges";
+import { getTimeRemaining } from "@/src/utils/challenges";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user.user);
 
+  const [rewards, setRewards] = useState(null);
+  const [creatorModules, setCreatorModules] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) return <p>Please log in to see your YouTube data.</p>;
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [rewardsRes, modulesRes, challengesRes] = await Promise.all([
+          getCreatorRewards(),
+          getCreatorModules(),
+          getChallenges(),
+        ]);
+
+        setRewards(rewardsRes?.data);
+        setCreatorModules(modulesRes?.data || []);
+        setChallenges(challengesRes?.data || []);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // 🔹 Challenges split
+  const enrolledChallenges = challenges.filter(
+    (c) =>
+      c.challenge_status === "active" &&
+      c.progress_status &&
+      c.progress_status !== "not_started" &&
+      (!c.submissions || c.submissions.length === 0)
+  );
+
+  const submittedChallenges = challenges.filter(
+    (c) => c.submissions && c.submissions.length > 0
+  );
 
   return (
-    <div className="page-content  min-h-screen transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-          Hi, {user.name} from {user.city}! 👋
-        </h2>
+    <div className="p-6 space-y-6">
+      {/* Greeting */}
+      <h2 className="text-2xl font-bold">Hi, {user?.name} 👋</h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left */}
-          <div className="lg:col-span-2 space-y-6">
-            <ProgressCard data={progressData} />
-            <ChallengeCard data={challengeData} />
-            <ModuleCard data={moduleData} />
-          </div>
+      {/* Progress & Rewards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Progress */}
+        <Card className="p-4">
+          <CardHeader>
+            <CardTitle>Your Progress 🎯</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <>
+                <Skeleton className="h-3 w-full mb-2" />
+                <Skeleton className="h-4 w-2/3" />
+              </>
+            ) : (
+              <>
+                <Progress
+                  value={
+                    (creatorModules.filter((m) => m.progress_status === "completed")
+                      .length /
+                      creatorModules.length) *
+                      100 || 0
+                  }
+                  className="mb-2"
+                />
+                <p className="text-sm text-muted-foreground">
+                  {
+                    creatorModules.filter((m) => m.progress_status === "completed")
+                      .length
+                  }{" "}
+                  of {creatorModules.length} Modules Completed
+                </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Right */}
-          <div className="space-y-6">
-            <BadgesCard data={badgesData} />
-            <QuickStatsCard data={quickStatsData} />
-            <UpcomingCard data={upcomingData} />
-          </div>
-        </div>
+        {/* Rewards */}
+        <Card className="p-4">
+          <CardHeader>
+            <CardTitle>Current Points ⭐</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </>
+            ) : (
+              <>
+                <p className="text-3xl font-bold">{rewards?.total_points || 0}</p>
+                <p className="text-sm text-muted-foreground">
+                  Coins: {rewards?.total_coins || 0}
+                </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Badges */}
+        <Card className="p-4">
+          <CardHeader>
+            <CardTitle>Badges 🏆</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-2 flex-wrap">
+            {loading ? (
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-16" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+            ) : rewards?.badges_earned > 0 ? (
+              [...Array(rewards.badges_earned)].map((_, i) => (
+                <Badge key={i} variant="secondary">
+                  🥇 Badge {i + 1}
+                </Badge>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">No badges yet</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Challenges Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Challenges 🚀</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[...Array(2)].map((_, i) => (
+                <Card key={i} className="p-4">
+                  <Skeleton className="h-5 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-full mb-3" />
+                  <Skeleton className="h-8 w-full" />
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Enrolled Challenges */}
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Currently Enrolled</h3>
+                {enrolledChallenges.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {enrolledChallenges.slice(0, 2).map((ch) => (
+                        <Card key={ch.challenge_id} className="p-4">
+                          <h4 className="font-semibold">
+                            {ch.challenge_title} ({ch.target_city})
+                          </h4>
+                          <p className="text-sm text-muted-foreground">{ch.description}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <Badge variant="outline">
+                              {getTimeRemaining(ch.end_date)} left
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {ch.points_earned}/{ch.reward_points} pts
+                            </span>
+                          </div>
+                          <Button className="mt-3 w-full">Submit Video 🎥</Button>
+                        </Card>
+                      ))}
+                    </div>
+                    {enrolledChallenges.length > 2 && (
+                      <Button asChild variant="outline" className="w-full mt-4">
+                        <Link href="/challenges">View More Enrolled</Link>
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <p className="text-muted-foreground mb-3">
+                      Ready for challenges? 🚀
+                    </p>
+                    <Button asChild>
+                      <Link href="/challenges">Explore Challenges</Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Submitted Challenges */}
+              <div>
+                <div className=" flex justify-between items-center">
+
+                <h3 className="font-semibold mb-3">Your Submissions</h3>
+                </div>
+                {submittedChallenges.length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {submittedChallenges.slice(0, 2).map((ch) => (
+                        <Card key={ch.challenge_id} className="p-4">
+                          <h4 className="font-semibold">{ch.challenge_title}</h4>
+                          <p className="text-sm text-muted-foreground">{ch.description}</p>
+                          <Button asChild variant="secondary" className="mt-3 w-full">
+                            <Link href={`/challenges/${ch.challenge_id}`}>
+                              View Submissions
+                            </Link>
+                          </Button>
+                        </Card>
+                      ))}
+                    </div>
+                    {submittedChallenges.length > 1 && (
+                      <Button asChild variant="outline" className="w-full mt-4">
+                        <Link href="/challenges">View More Submissions</Link>
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-muted-foreground">No submissions yet.</p>
+                )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Modules */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Modules 📚</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[...Array(2)].map((_, i) => (
+                <Card key={i} className="p-4">
+                  <Skeleton className="h-5 w-2/3 mb-2" />
+                  <Skeleton className="h-4 w-full mb-3" />
+                  <Skeleton className="h-3 w-1/2" />
+                </Card>
+              ))}
+            </div>
+          ) : creatorModules.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {creatorModules.slice(0, 2).map((m) => (
+                  <Card
+                    key={m.module_id}
+                    className="p-4 hover:shadow-md cursor-pointer transition"
+                  >
+                    <h4 className="font-medium">{m.title}</h4>
+                    <p className="text-sm text-muted-foreground">{m.documentation}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <Progress
+                        value={m.progress_status === "completed" ? 100 : 0}
+                        className="w-2/3"
+                      />
+                      <span className="text-xs">
+                        {m.points_earned}/{m.reward_points_can_achieve} pts
+                      </span>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+              {creatorModules.length > 2 && (
+                <Button asChild variant="outline" className="w-full mt-4">
+                  <Link href="/modules">View More Modules</Link>
+                </Button>
+              )}
+            </>
+          ) : (
+            <p className="text-muted-foreground">No modules assigned yet.</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
