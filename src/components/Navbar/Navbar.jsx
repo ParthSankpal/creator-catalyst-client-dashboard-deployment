@@ -1,10 +1,9 @@
-"use client";
+"use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { Bell, ChevronDown, LogOut, User } from "lucide-react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import ThemeToggle from "../ThemeToggle/ThemeToggle";
-import { useState } from "react";
+import { Bell, ChevronDown, LogOut, User } from "lucide-react"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import ThemeToggle from "../ThemeToggle/ThemeToggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,10 +34,9 @@ export default function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-16 w-full shrink-0 items-center gap-10 px-3 bg-transparent">
-      <div className="w-10 h-10 rounded-full bg-sky-400/30 backdrop-blur-sm flex items-center justify-center hover:bg-sky-400/40 transition-all">
-        <SidebarTrigger />
-      </div>
+    <header className="flex h-16 w-full shrink-0 items-center gap-2 border-b px-4 bg-background">
+      {/* Sidebar toggle button */}
+      <SidebarTrigger />
 
       {/* Title & Right actions */}
       <div className="flex flex-1 items-center justify-between">
@@ -46,8 +44,10 @@ export default function Navbar() {
         <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
 
         {/* Right section */}
-        <div className="flex items-center gap-5">
-          <button className="w-10 h-10 rounded-full bg-sky-400/30 backdrop-blur-sm flex items-center justify-center text-gray-500 hover:text-foreground hover:bg-sky-400/40 transition-all hover:cursor-pointer">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+
+          <button className="p-2 rounded-md text-gray-500 hover:text-foreground">
             <Bell className="h-5 w-5" />
           </button>
 
@@ -78,14 +78,6 @@ export default function Navbar() {
           </DropdownMenu>
         </div>
       </div>
-
-      {/* Click outside to close dropdown */}
-      {isProfileOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsProfileOpen(false)}
-        />
-      )}
     </header>
-  );
+  )
 }
