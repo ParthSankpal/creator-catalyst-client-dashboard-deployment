@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { startGoogle } from "../api/authApi";
 
 export default function Home() {
   return (
@@ -34,32 +35,67 @@ export default function Home() {
           <img src="/cclogo.png" alt="Company Logo" className="h-10 w-auto" />
         </div>
         <div>
-          <Link
+          {/* <Link
             href="/login"
             className="backdrop-blur-2xl inline-flex items-center justify-center gap-2 rounded-3xl border border-white font-semibold text-gray-700 text-sm sm:text-base shadow-md shadow-gray-100/50 hover:shadow-lg hover:cursor-pointer hover:shadow-gray-200/10 hover:bg-gray-50 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-sky-200 focus:ring-offset-2 px-5 py-2"
             style={{ backgroundColor: "#ffffff6d" }}
           >
             Sign In
-          </Link>
+          </Link> */}
         </div>
       </nav>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6">
         <h1 className="text-3xl sm:text-5xl font-medium text-gray-600 mb-6 mt-20">
-          Track all your progress and <br/>learn from modules
+          Track all your progress and <br />
+          learn from modules
         </h1>
 
-        <Link
-          href="/login"
-          className="backdrop-blur-2xl w-60 sm:w-70 inline-flex items-center justify-center gap-2 sm:gap-2 rounded-4xl border border-white font-semibold text-gray-700 text-sm sm:text-base shadow-lg shadow-gray-100/50 hover:shadow-xl hover:cursor-pointer hover:shadow-gray-200/10 hover:bg-gray-50 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-sky-200 focus:ring-offset-2 mx-auto"
-          style={{
-            backgroundColor: "#ffffff6d",
-            padding: "1.25rem 1.5rem",
-            marginTop: "1.5rem",
-          }}
-        >
-          <p className="font-medium">Get Access</p>
-        </Link>
+        <div className=" mt-0 sm:mt-0 relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6">
+          <div className="relative z-1000 w-full max-w-md mx-auto">
+            <div className="bg-none rounded-3xl p-6 sm:p-8 flex flex-col justify-center align-middle">
+              <button
+                type="button"
+                onClick={() => startGoogle()}
+                className="backdrop-blur-2xl w-60 sm:w-70 inline-flex items-center justify-center gap-2 sm:gap-2 rounded-4xl border border-white font-semibold text-gray-700 text-sm sm:text-base shadow-lg shadow-gray-100/50 hover:shadow-xl hover:cursor-pointer hover:shadow-gray-200/10 hover:bg-gray-50 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-sky-200 focus:ring-offset-2 mx-auto"
+                style={{
+                  backgroundColor: "#ffffff6d",
+                  padding: "1.25rem 1.5rem",
+                }}
+              >
+                <img
+                  src="/google.svg"
+                  alt="Google"
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                />
+                <p className="font-medium">Continue with Google</p>
+              </button>
+
+              <div className="mt-6 flex items-center justify-center text-sm text-gray-600">
+                <a
+                  href="/terms"
+                  className="hover:text-gray-500 transition-colors duration-200 hover:cursor-pointer"
+                >
+                  Terms
+                </a>
+                <span className="mx-3 text-gray-400">•</span>
+                <a
+                  href="/privacy"
+                  className="hover:text-gray-500 transition-colors duration-200 hover:cursor-pointer"
+                >
+                  Privacy
+                </a>
+                <span className="mx-3 text-gray-400">•</span>
+                <a
+                  href="/help"
+                  className="hover:text-gray-500 transition-colors duration-200 hover:cursor-pointer"
+                >
+                  Help
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="mt-12 w-full flex justify-center">
           <img
