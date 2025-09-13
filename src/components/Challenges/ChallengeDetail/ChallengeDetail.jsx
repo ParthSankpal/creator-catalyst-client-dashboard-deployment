@@ -14,6 +14,7 @@ import {
   getChallengeById,
   submitChallenge,
   startChallenge,
+  getCreatorChallengeSubmissions,
 } from "@/src/api/challenges"
 
 import SubmitChallengeModal from "../SubmitChallengeModal/SubmitChallengeModal"
@@ -37,6 +38,7 @@ export default function ChallengeDetail() {
   const [starting, setStarting] = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
+  const [submissions, setSubmissions] = useState([])
 
   // 🔹 Refetch wrapper
   const fetchChallenge = async () => {
@@ -88,6 +90,20 @@ export default function ChallengeDetail() {
     }
   }
 
+
+  const handleViewSubmissions = async (id) => {
+    try {      
+      const res = await getCreatorChallengeSubmissions(id)
+      console.log(res?.data, "getCreatorChallengeSubmissions");
+      
+      setShowSubmissionsModal(true)
+      setSubmissions(res?.data || [])
+    } catch (err) {
+      console.error("Error fetching submissions:", err)
+      setSubmissions([])
+    } 
+  }
+
   // 🔹 Loading skeleton
   if (loading) {
     return (
@@ -130,7 +146,7 @@ export default function ChallengeDetail() {
           <Button
             variant="outline"
             className=" cursor-pointer"
-            onClick={() => setShowSubmissionsModal(true)}
+            onClick={() => handleViewSubmissions(id)}
           >
             View Submissions
           </Button>
@@ -246,7 +262,7 @@ export default function ChallengeDetail() {
         <PreviousSubmissionsModal
           open={showSubmissionsModal}
           onClose={() => setShowSubmissionsModal(false)}
-          submissions={challenge.submissions || []}
+          submissions={submissions || []}
           challenge={challenge}
         />
 

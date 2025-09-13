@@ -44,7 +44,7 @@ export default function PreviousSubmissionsModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="sm:max-w-5xl w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
             {emoji} {challenge.challenge_title}
@@ -92,14 +92,15 @@ export default function PreviousSubmissionsModal({
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Submission</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Points Awarded</TableHead>
                 <TableHead>Submitted At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((s) => (
-                <TableRow key={s.submission_id}>
-                  <TableCell>{s.submission_id}</TableCell>
+                <TableRow key={s.id}>
+                  <TableCell>{s.id}</TableCell>
                   <TableCell>
                     <a
                       href={s.submission_url}
@@ -109,6 +110,19 @@ export default function PreviousSubmissionsModal({
                     >
                       View
                     </a>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        s.status === "submitted"
+                          ? "secondary"
+                          : s.status === "rejected"
+                          ? "destructive"
+                          : "outline"
+                      }
+                    >
+                      {s.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>{s.points_awarded}</TableCell>
                   <TableCell>
