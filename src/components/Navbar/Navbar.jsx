@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation"
-import { Bell, LogOut, User } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { useState } from "react";
