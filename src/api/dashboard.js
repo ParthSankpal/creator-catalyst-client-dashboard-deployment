@@ -8,8 +8,8 @@ export const getCreatorRewards = async () => {
 };
 
 // get leaderboad data
-export const geLeaderboard = async (id) => {
-  const res = await axiosClient.get(`/api/geLeaderboard`);
+export const getLeaderboard = async (id) => {
+  const res = await axiosClient.get(`/api/getLeaderboard`);
   return res.data;
 };
 
