@@ -20,14 +20,6 @@ export const startChallenge = async (id) => {
 };
 
 export const submitChallenge = (id, payload) => {
-  // // Convert object to URLSearchParams for x-www-form-urlencoded
-  // const payload = new URLSearchParams();
-  // Object.keys(formData).forEach((key) => {
-  //   if (formData[key] !== undefined && formData[key] !== null) {
-  //     payload.append(key, formData[key]);
-  //   }
-  // });
-
   return axiosClient.post(`/api/challengeSubmit/${id}`, payload, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',

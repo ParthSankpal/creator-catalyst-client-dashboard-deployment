@@ -13,10 +13,11 @@ export const generateFirebaseMessageToken = async () => {
       });
 
       if (token) {
-        console.log("📲 Device Token:", token);
+        const dedviceToken = new URLSearchParams();
+        dedviceToken.append("token", token);
 
         // ✅ Register device token with backend
-        await CreatorSubscribe(token);
+        await CreatorSubscribe(dedviceToken);
       }
 
       return token;
