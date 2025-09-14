@@ -1,6 +1,6 @@
 import { getToken } from "firebase/messaging";
-import { messaging } from "./firebaseConfig"; 
 import { CreatorSubscribe } from "../api/notificationApi";
+import { messaging } from "./firebase.config";
 
 export const generateFirebaseMessageToken = async () => {
   try {
