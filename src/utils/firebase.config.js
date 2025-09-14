@@ -1,28 +1,21 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging } from "firebase/messaging";
 
+// Firebase config from environment variables
 const firebaseConfig = {
-    apiKey: "AIzaSyDu6nj4nGi9IDuNWsPNZOsNVhtDltSyGHY",
-    authDomain: "connectpingnetwork.firebaseapp.com",
-    projectId: "connectpingnetwork",
-    storageBucket: "connectpingnetwork.firebasestorage.app",
-    messagingSenderId: "29028461956",
-    appId: "1:29028461956:web:cfb871c328aefc2a0241d1",
-    measurementId: "G-CRTXGHZ2VP"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig)
-const messaging = getMessaging(app);
+let messaging = null;
 
-const generateFirebaseMessageToken = async () => {
-    const permission = await Notification.requestPermission();
-    console.log(permission);
-
-    if(permission === "granted") {
-        const token = await getToken(messaging, {vapidKey: "BJi5vY-cNpiiiVwddAGNWn2EvopHCTZu1WOREQWgg1XIIV71WAC5YSvYCb2OpE_iyui8OwJY2zW1T0zQqSfeUC0"});
-        console.log(token);
-        return token;
-    }
+if (typeof window !== "undefined") {
+  const app = initializeApp(firebaseConfig);
+  messaging = getMessaging(app);
 }
 
-export {app, generateFirebaseMessageToken, messaging};
+export { messaging };

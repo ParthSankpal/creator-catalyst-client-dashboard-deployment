@@ -13,23 +13,79 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/src/api/authApi";
+import { useEffect } from 'react'
+
+import { onMessage } from 'firebase/messaging';
+import { generateFirebaseMessageToken } from "@/src/utils/firebaseMessaging";
+import { messaging } from "@/src/utils/firebase.config";
+
 
 // 🔔 Notifications Dropdown
 function NotificationsDropdown() {
   const [showAll, setShowAll] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
-  const notifications = [
-    "🔔 Your profile was viewed",
-    "💬 New comment on your post",
-    "⬆️ Update available for your project",
-    "📩 You have a new message",
-    "⏳ Your subscription will expire soon",
-    "🛠️ Server maintenance scheduled",
-    "👥 Team member joined your workspace",
-    "✅ Password changed successfully",
-    "📅 Reminder: Meeting at 4 PM",
-    "🤝 Invitation to collaborate on project",
-  ];
+  //   useEffect(() => {
+  //   generateFirebaseMessageToken();
+
+  //   const unsubscribe = onMessage(messaging, (payload) => {
+  //     console.log("📩 FCM Payload:", payload);
+
+  //     const title = payload?.notification?.title || "Notification";
+  //     const body = payload?.notification?.body || "";
+  //     const data = payload?.data || {};
+
+  //     // Build display message
+  //     const notifText = body
+  //       ? `${title} — ${body}`
+  //       : title;
+
+  //     // Optionally append custom data
+  //     const fullNotif = Object.keys(data).length
+  //       ? `${notifText}\n${JSON.stringify(data)}`
+  //       : notifText;
+
+  //     setNotifications((prev) => [fullNotif, ...prev]);
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
+
+
+
+  useEffect(() => {
+    if (typeof window === "undefined") return; // ✅ prevent SSR issues
+
+    const initFCM = async () => {
+      const token = await generateFirebaseMessageToken();
+      console.log("FCM Device Token:", token);
+    };
+
+    initFCM();
+
+    // ✅ Setup listener for foreground messages
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("📩 FCM Payload:", payload);
+
+      const title = payload?.notification?.title || "Notification";
+      const body = payload?.notification?.body || "";
+      const data = payload?.data || {};
+
+      const notifText = body ? `${title} — ${body}` : title;
+
+      const fullNotif =
+        Object.keys(data).length > 0
+          ? `${notifText}\n${JSON.stringify(data)}`
+          : notifText;
+
+      setNotifications((prev) => [fullNotif, ...prev]);
+    });
+
+    // ✅ Cleanup
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <DropdownMenu
@@ -45,24 +101,29 @@ function NotificationsDropdown() {
 
       <DropdownMenuContent
         align="end"
-        className={`w-80 transition-all ${
-          showAll ? "max-h-96" : "max-h-64"
-        } overflow-y-auto p-2`}
+        className={`w-80 transition-all ${showAll ? "max-h-96" : "max-h-64"
+          } overflow-y-auto p-2`}
       >
-        <div className="space-y-2">
-          {(showAll ? notifications : notifications.slice(0, 3)).map(
-            (notif, i) => (
-              <DropdownMenuItem
-                key={i}
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                {notif}
-              </DropdownMenuItem>
-            )
-          )}
-        </div>
+        {notifications.length === 0 ? (
+          <div className="text-sm text-muted-foreground p-2 text-center">
+            No notifications yet
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {(showAll ? notifications : notifications.slice(0, 3)).map(
+              (notif, i) => (
+                <DropdownMenuItem
+                  key={i}
+                  className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  {notif}
+                </DropdownMenuItem>
+              )
+            )}
+          </div>
+        )}
 
-        {!showAll && (
+        {notifications.length > 3 && !showAll && (
           <>
             <DropdownMenuSeparator />
             <div
@@ -78,6 +139,7 @@ function NotificationsDropdown() {
     </DropdownMenu>
   );
 }
+
 
 export default function Navbar() {
   const pathname = usePathname();

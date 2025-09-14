@@ -5,7 +5,8 @@ import { useEffect } from 'react'
 
 import { onMessage } from 'firebase/messaging';
 import { useState } from 'react';
-import { generateFirebaseMessageToken, messaging } from '@/src/utils/firebase.config';
+import { generateFirebaseMessageToken } from '@/src/utils/firebaseMessaging';
+
 
 function textPage() {
 
@@ -14,12 +15,32 @@ function textPage() {
         body: ""
     })
 
+    // useEffect(() => {
+    //     generateFirebaseMessageToken();
+    //     onMessage(messaging, payload => {
+    //         console.log(payload)
+    //     })
+    // }, [])
+
     useEffect(() => {
-        generateFirebaseMessageToken();
-        onMessage(messaging, payload => {
-            console.log(payload)
-        })
-    }, [])
+        if (typeof window === "undefined") return;
+
+        const init = async () => {
+            await generateFirebaseMessageToken();
+        };
+
+        init();
+
+       
+        const unsubscribe = onMessage(messaging, (payload) => {
+            console.log("📩 FCM Payload:", payload);
+        });
+
+       
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -36,7 +57,7 @@ function textPage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({...formData, link: "/contact"})
+            body: JSON.stringify({ ...formData, link: "/contact" })
         })
         console.log(response);
     }

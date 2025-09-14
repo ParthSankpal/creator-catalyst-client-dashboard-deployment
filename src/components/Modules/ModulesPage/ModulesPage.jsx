@@ -26,15 +26,18 @@ const ModulesPage = () => {
           getCreatorModules(),
         ]);
 
+        console.log(allRes, creatorRes);
+
         if (allRes.status === "success") {
-          setAllModules(transformModulesData(allRes.data));
+          setAllModules(transformModulesData(allRes.data, "all"));
         }
 
         if (creatorRes.status === "success") {
-          const transformed = transformModulesData(creatorRes.data);
+          const transformed = transformModulesData(creatorRes.data, "creator");
           setCreatorModules(transformed);
           setProgress(calculateProgress(transformed));
         }
+
       } catch (err) {
         console.error("Error fetching modules:", err);
       } finally {
@@ -45,8 +48,6 @@ const ModulesPage = () => {
     fetchModules();
   }, []);
 
-  const isModuleStarted = (id) =>
-    creatorModules.some((m) => m.id === id);
 
   return (
     <div className="page-content min-h-screen">
@@ -82,7 +83,7 @@ const ModulesPage = () => {
           )}
         </div>
 
-        {/* All Modules Grid */}
+        {/* All Modules */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
@@ -96,27 +97,26 @@ const ModulesPage = () => {
         ) : allModules.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allModules.map((module) =>
-              isModuleStarted(module.id) ? (
-                <ModuleCard key={module.id} {...module} />
-              ) : (
-                <Card key={module.id} className="flex flex-col justify-between">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold">
-                      {module.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {module.documentation}
-                    </p>
-                  </CardContent>
-                  <div className="p-4">
-                    <Button asChild>
-                      <a href={`/modules/${module.id}`}>Start Module</a>
-                    </Button>
-                  </div>
-                </Card>
-              )
+
+              // Show start option for not-started module
+              <Card key={module.id} className="flex flex-col justify-between">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">
+                    {module.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {module.documentation}
+                  </p>
+                </CardContent>
+                <div className="p-4">
+                  <Button asChild>
+                    <a href={`/modules/${module.id}`}>view</a>
+                  </Button>
+                </div>
+              </Card>
+
             )}
           </div>
         ) : (
