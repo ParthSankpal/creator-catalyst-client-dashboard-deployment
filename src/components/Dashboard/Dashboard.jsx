@@ -191,11 +191,13 @@ export default function Dashboard() {
       {/* Submitted Challenges */}
       <div className="mb-10">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="font-semibold">Your Submissions</h3>
           {submittedChallenges.length > 1 && (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/challenges">View More</Link>
-            </Button>
+            <>
+              <h3 className="font-semibold">Your Submissions</h3>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/challenges">View More</Link>
+              </Button>
+            </>
           )}
         </div>
 
@@ -213,9 +215,7 @@ export default function Dashboard() {
               </Card>
             ))}
           </div>
-        ) : (
-          <p className="text-muted-foreground">No submissions yet.</p>
-        )}
+        ) : (null)}
       </div>
 
 

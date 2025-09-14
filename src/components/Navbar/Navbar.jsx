@@ -24,43 +24,15 @@ import { messaging } from "@/src/utils/firebase.config";
 function NotificationsDropdown() {
   const [showAll, setShowAll] = useState(false);
   const [notifications, setNotifications] = useState([]);
-
-  //   useEffect(() => {
-  //   generateFirebaseMessageToken();
-
-  //   const unsubscribe = onMessage(messaging, (payload) => {
-  //     console.log("📩 FCM Payload:", payload);
-
-  //     const title = payload?.notification?.title || "Notification";
-  //     const body = payload?.notification?.body || "";
-  //     const data = payload?.data || {};
-
-  //     // Build display message
-  //     const notifText = body
-  //       ? `${title} — ${body}`
-  //       : title;
-
-  //     // Optionally append custom data
-  //     const fullNotif = Object.keys(data).length
-  //       ? `${notifText}\n${JSON.stringify(data)}`
-  //       : notifText;
-
-  //     setNotifications((prev) => [fullNotif, ...prev]);
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
-
-
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isShaking, setIsShaking] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ prevent SSR issues
 
     const initFCM = async () => {
-      const token = await generateFirebaseMessageToken();
-      console.log("FCM Device Token:", token);
+      await generateFirebaseMessageToken();
     };
-
     initFCM();
 
     // ✅ Setup listener for foreground messages
@@ -79,6 +51,11 @@ function NotificationsDropdown() {
           : notifText;
 
       setNotifications((prev) => [fullNotif, ...prev]);
+
+      // ✅ add unread count & shake effect
+      setUnreadCount((prev) => prev + 1);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 1000);
     });
 
     // ✅ Cleanup
@@ -90,19 +67,30 @@ function NotificationsDropdown() {
   return (
     <DropdownMenu
       onOpenChange={(open) => {
-        if (!open) setShowAll(false); // reset when dropdown closes
+        if (open) setUnreadCount(0); // reset unread count when opened
+        if (!open) setShowAll(false); // reset view all
       }}
     >
       <DropdownMenuTrigger asChild>
-        <button className="p-2 rounded-md text-gray-500 hover:text-foreground focus:outline-none focus:ring-0 hover:cursor-pointer">
+        <button
+          className={`relative p-2 rounded-md text-gray-500 hover:text-foreground focus:outline-none focus:ring-0 hover:cursor-pointer ${
+            isShaking ? "animate-bell-shake" : ""
+          }`}
+        >
           <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+              {unreadCount}
+            </span>
+          )}
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="end"
-        className={`w-80 transition-all ${showAll ? "max-h-96" : "max-h-64"
-          } overflow-y-auto p-2`}
+        className={`w-80 transition-all ${
+          showAll ? "max-h-96" : "max-h-64"
+        } overflow-y-auto p-2`}
       >
         {notifications.length === 0 ? (
           <div className="text-sm text-muted-foreground p-2 text-center">

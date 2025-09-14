@@ -7,14 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  completeModule,
-  getCreatorModuleSubmissions,
-  getModuleById,
-  startModule,
-  submitModule,
-} from "@/src/api/modules";
+
 import { Skeleton } from "@/components/ui/skeleton"; // ✅ import skeleton
+import { completeModule, getCreatorModulSubmissions, getModuleById, startModule, submitModule } from "@/src/api/modules";
 
 export default function ModuleDetailsPage() {
   const { id } = useParams();
@@ -35,15 +30,16 @@ export default function ModuleDetailsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [moduleRes] = await Promise.all([
+        const [moduleRes, submissionsRes] = await Promise.all([
           getModuleById(id),
-          // getCreatorModuleSubmissions(id),
+          
+          getCreatorModulSubmissions(id),
         ]);
 
         console.log(moduleRes);
         
         setModule(moduleRes.data);
-        // setSubmissions(submissionsRes.data || []);
+        setSubmissions(submissionsRes.data || []);
       } catch (err) {
         console.error("Error fetching module:", err);
       } finally {
@@ -80,7 +76,7 @@ export default function ModuleDetailsPage() {
       alert("Submission added!");
       setSubmissionModalOpen(false);
       setNewLink("");
-      const subs = await getCreatorModuleSubmissions(id);
+      const subs = await getCreatorModulSubmissions(id);
       setSubmissions(subs.data || []);
     } catch (err) {
       console.error("Error submitting:", err);

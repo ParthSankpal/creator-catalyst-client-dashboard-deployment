@@ -30,9 +30,12 @@ export const submitChallenge = (id, payload) => {
 
 // ✅ Get all submissions of a challenge (for creator)
 export const getCreatorChallengeSubmissions = async (id) => {
-  const res = await axiosClient.get(`/api/getCreatorChallengeSubmissions/${id}`);
+  const res = await axiosClient.get(
+    `/api/getCreatorSubmissionsById/${id}?submission_type=challenge`
+  );
   return res.data;
 };
+
 
 // ✅ Get all challenges created by the creator (progress tracking)
 export const getCreatorChallenges = async () => {

@@ -111,7 +111,7 @@ const ModulesPage = () => {
                   </p>
                 </CardContent>
                 <div className="p-4">
-                  <Button asChild>
+                  <Button variant="secondary" asChild className=" w-full">
                     <a href={`/modules/${module.id}`}>view</a>
                   </Button>
                 </div>

@@ -30,9 +30,11 @@ export const submitModule = async (id, payload) => {
   return res.data;
 };
 
-// ✅ Get all submissions of a module (for creator)
-export const getCreatorModuleSubmissions = async (id) => {
-  const res = await axiosClient.get(`/api/getCreatorModuleSubmissions/${id}`);
+// ✅ Get all submissions of a challenge (for creator)
+export const getCreatorModulSubmissions = async (id) => {
+  const res = await axiosClient.get(
+    `/api/getCreatorSubmissionsById/${id}?submission_type=module`
+  );
   return res.data;
 };
 

@@ -135,3 +135,18 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+
+@keyframes bell-shake {
+  0% { transform: rotate(0); }
+  15% { transform: rotate(30deg); }
+  30% { transform: rotate(-20deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-20deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0); }
+}
+
+.animate-bell-shake {
+  animation: bell-shake 1s ease-in-out;
+}
