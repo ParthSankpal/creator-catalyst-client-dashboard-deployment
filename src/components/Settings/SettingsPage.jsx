@@ -1,7 +1,7 @@
 "use client";
 
 import NotificationsForm from "./NotificationsForm";
-import ProfileForm from "./ProfileForm";
+
 
 
 export default function SettingsPage() {
@@ -23,7 +23,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-6">
                 
-                    <ProfileForm />
+                    
                     <NotificationsForm />
                 </div>
             </div>
