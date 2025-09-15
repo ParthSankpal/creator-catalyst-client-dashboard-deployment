@@ -97,11 +97,11 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mt-12 w-full flex justify-center">
+        <div className="mt-0 sm:-mt-10 w-full flex justify-center">
           <img
             src="/dashboard.png"
             alt="Dashboard Preview"
-            className="w-full sm:w-[70%] rounded-2xl shadow-xl"
+            className="w-full sm:w-[90%] rounded-2xl mt-0"
           />
         </div>
       </div>
