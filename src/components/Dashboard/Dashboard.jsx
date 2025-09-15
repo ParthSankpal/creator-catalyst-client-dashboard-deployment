@@ -74,9 +74,9 @@ export default function Dashboard() {
       {/* Progress, Rewards, Badges & Rank */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-5">
         {/* Progress */}
-        <Card className="p-4">
+        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
           <CardHeader>
-            <CardTitle>Your Progress 🎯</CardTitle>
+            <CardTitle>Your Progress</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -110,9 +110,9 @@ export default function Dashboard() {
         </Card>
 
         {/* Rewards */}
-        <Card className="p-4">
+        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
           <CardHeader>
-            <CardTitle>Current Points ⭐</CardTitle>
+            <CardTitle>Current Coins</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -122,21 +122,27 @@ export default function Dashboard() {
               </>
             ) : (
               <>
-                <p className="text-3xl font-bold">
-                  {rewards?.total_points || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Coins: {rewards?.total_coins || 0}
-                </p>
+                <div className="flex items-center gap-2">
+                  <img src="/coin.png" alt="Coin" className="h-9" />
+                  <p
+                    className="text-4xl font-semibold"
+                    style={{ color: "#279AFF" }}
+                  >
+                    {rewards?.total_coins || 0}
+                  </p>
+                </div>
+                {/* <p className="text-sm text-muted-foreground">
+                  Points: {rewards?.total_points || 0}
+                </p> */}
               </>
             )}
           </CardContent>
         </Card>
 
         {/* Badges */}
-        <Card className="p-4">
+        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
           <CardHeader>
-            <CardTitle>Badges 🏆</CardTitle>
+            <CardTitle>Badges</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-2 flex-wrap">
             {loading ? (
@@ -157,9 +163,9 @@ export default function Dashboard() {
         </Card>
 
         {/* Rank */}
-        <Card className="p-4">
+        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
           <CardHeader>
-            <CardTitle>Your Rank 🥇</CardTitle>
+            <CardTitle>Your Rank</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
