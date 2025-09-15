@@ -6,7 +6,7 @@ import AppSidebar from "../Sidebar/AppSidebar"
 
 export default function MainSection({ children }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background text-foreground">
         {/* Sidebar */}
         <AppSidebar />

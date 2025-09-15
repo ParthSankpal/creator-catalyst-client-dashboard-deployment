@@ -249,17 +249,19 @@ export default function Dashboard() {
                   key={m.module_id}
                   className="p-4 hover:shadow-md cursor-pointer transition"
                 >
-                  <h4 className="font-medium">{m.title}</h4>
-                  <p className="text-sm text-muted-foreground">{m.documentation}</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <Progress
-                      value={m.progress_status === "completed" ? 100 : 0}
-                      className="w-2/3"
-                    />
-                    <span className="text-xs">
-                      {m.points_earned}/{m.reward_points_can_achieve} pts
-                    </span>
-                  </div>
+                  <Link href={`/modules/${m.module_id}`} className="">
+                    <h4 className="font-medium">{m.title}</h4>
+                    <p className="text-sm text-muted-foreground">{m.documentation}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <Progress
+                        value={m.progress_status === "completed" ? 100 : 0}
+                        className="w-2/3"
+                      />
+                      <span className="text-xs">
+                        {m.points_earned}/{m.reward_points_can_achieve} pts
+                      </span>
+                    </div>
+                  </Link>
                 </Card>
               ))}
             </div>

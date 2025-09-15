@@ -11,7 +11,6 @@ export default function AuthCallback() {
   
   useEffect(() => {
     const jwt = params.get("jwt");
-    const user_id = params.get("user_id");
     const name = params.get("name");
     const email = params.get("email");
     

@@ -56,7 +56,7 @@ const InitialStateManager = () => {
         // 🚨 If no local user → hit API once (to verify session if needed)
         const data = await getUser();
         if (data?.user) {
-          dispatch(setUser({ user: data.user, token: data.token }));
+          dispatch(setUser({ user: data.user, user_id:data.id  ,token: data.token }));
         } else if (!publicPages.includes(pathname)) {
           router.push("/login");
         }

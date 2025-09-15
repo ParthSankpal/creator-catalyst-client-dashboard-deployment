@@ -45,6 +45,9 @@ export default function ChallengeDetail() {
     setLoading(true)
     try {
       const res = await getChallengeById(id)
+
+      console.log(res.data);
+      
       setChallenge(res?.data)
     } catch (err) {
       console.error("Failed to fetch challenge", err)

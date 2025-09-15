@@ -5,6 +5,7 @@ import { setCookie } from "../../../utils/cookieHandler";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { addAuthHeaderToAxios } from "../../../utils/apiClient";
+import { Loader2 } from "lucide-react";
 
 export default function AuthCallback() {
   const params = useSearchParams();
@@ -13,29 +14,29 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const jwt = params.get("jwt");
-    const user_id = params.get("user_id");
-    const name = params.get("name");
-    const email = params.get("email");
-
-    console.log(jwt, user_id, name, email);
 
     const handleLogin = async () => {
       if (jwt) {
-        // Save cookies
+        setLoading(true);
         setCookie("jwt", jwt, { expires: 7 });
-        setCookie(
-          "user",
-          JSON.stringify({ id: user_id, name, email }),
-          { expires: 7 }
-        );
-
-        // Set axios auth header
         addAuthHeaderToAxios(`Bearer ${jwt}`);
 
-        // Fetch user data from backend
         try {
-          const data = await getUser();
-          console.log("Fetched user:", data);
+          const res = await getUser();
+          const userData = res?.data;
+
+          if (userData) {
+            setCookie(
+              "user",
+              JSON.stringify({
+                id: userData.id,
+                name: userData.user_name || userData.channel_name,
+                email: userData.user_email,
+              }),
+              { expires: 7 }
+            );
+          }
+
           router.push("/dashboard");
         } catch (err) {
           if (err.response?.status === 401) {
@@ -46,6 +47,8 @@ export default function AuthCallback() {
         } finally {
           setLoading(false);
         }
+      } else {
+        router.push("/login");
       }
     };
 
@@ -55,10 +58,12 @@ export default function AuthCallback() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-[#222222]">
       {loading && (
-        <>
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-          <p className="text-gray-700 dark:text-gray-200 text-lg">Logging you in...</p>
-        </>
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500 mb-4" />
+          <p className="text-gray-700 dark:text-gray-200 text-lg">
+            Logging you in...
+          </p>
+        </div>
       )}
     </div>
   );
