@@ -117,7 +117,7 @@ export default function Dashboard() {
                 }
                 className="h-3 rounded-full mb-0"
                 style={{
-                  backgroundColor: "#E5E7EB"
+                  backgroundColor: "#E5E7EB",
                 }}
                 indicatorClassName="bg-[#279AFF] rounded-full"
               />
@@ -212,27 +212,81 @@ export default function Dashboard() {
         </Card>
 
         {/* Badges */}
-        {/* <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
+        <Card
+          className="p-4 rounded-2xl"
+          style={{ border: "1px solid #98CFFE" }}
+        >
           <CardHeader>
-            <CardTitle>Badges</CardTitle>
+            <CardTitle className="text-xl font-semibold text-black">
+              Badges
+            </CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-2 flex-wrap">
+
+          <CardContent>
             {loading ? (
-              <div className="flex gap-2">
-                <Skeleton className="h-6 w-16" />
-                <Skeleton className="h-6 w-16" />
+              <div className="grid grid-cols-2 gap-3">
+                {[...Array(2)].map((_, i) => (
+                  <Card key={i} className="p-3 flex flex-col items-center">
+                    <Skeleton className="h-8 w-8 mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                  </Card>
+                ))}
               </div>
-            ) : rewards?.badges_earned > 0 ? (
-              [...Array(rewards.badges_earned)].map((_, i) => (
-                <Badge key={i} variant="secondary">
-                  🥇 Badge {i + 1}
-                </Badge>
-              ))
+            ) : rewards?.badges?.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {rewards.badges.map((badge) => (
+                  <Card
+                    key={badge.id}
+                    className="p-4 flex flex-col items-center justify-center text-center hover:shadow-md transition rounded-xl"
+                    style={{ border: "1px solid #E5E7EB" }}
+                  >
+                    <div className="text-3xl">{badge.icon}</div>
+                    <p className="text-sm font-medium mt-2">{badge.label}</p>
+                  </Card>
+                ))}
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">No badges yet</p>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
+
+        {/* Challenges Completed */}
+        <Card
+          className="p-6 rounded-2xl shadow-md"
+          style={{
+            background: "#fff",
+            border: "1px solid #98CFFE",
+            boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
+          }}
+        >
+          <CardHeader className="p-0 mb-2">
+            <CardTitle className="text-xl font-semibold text-black">
+              Challenges Completed
+            </CardTitle>
+            <p className="text-sm text-gray-500">
+              Each challenge completed brings you closer to mastery.
+            </p>
+          </CardHeader>
+
+          <CardContent className="p-0 mt-0 ml-1 mb-4">
+            {loading ? (
+              <>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <p
+                  className="text-4xl font-semibold"
+                  style={{ color: "#279AFF" }}
+                >
+                  {rewards?.challenges?.completed || 0}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Enrolled Challenges */}
