@@ -78,41 +78,99 @@ export default function Dashboard() {
       </p>
 
       {/* Progress, Rewards, Badges & Rank */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-5">
         {/* Progress */}
-        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
-          <CardHeader>
-            <CardTitle>Your Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <>
-                <Skeleton className="h-3 w-full mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </>
-            ) : (
-              <>
-                <Progress
-                  value={
-                    (creatorModules.filter(
-                      (m) => m.progress_status === "completed"
-                    ).length /
-                      creatorModules.length) *
-                      100 || 0
-                  }
-                  className="mb-2"
-                />
-                <p className="text-sm text-muted-foreground">
-                  {
-                    creatorModules.filter(
-                      (m) => m.progress_status === "completed"
-                    ).length
-                  }{" "}
-                  of {creatorModules.length} Modules Completed
-                </p>
-              </>
-            )}
-          </CardContent>
+        <Card
+          className="p-6 rounded-2xl"
+          style={{
+            background: "#fff",
+            border: "1px solid #98CFFE",
+            boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
+          }}
+        >
+          {loading ? (
+            <>
+              <Skeleton className="h-6 w-32 mb-3" />
+              <Skeleton className="h-3 w-full mb-2" />
+              <Skeleton className="h-4 w-40" />
+            </>
+          ) : (
+            <>
+              {/* Title */}
+              <h2 className="text-xl font-semibold text-black mb-0">
+                Your Progress
+              </h2>
+
+              {/* Subtext */}
+              <p className="text-sm text-gray-500 mb-2">
+                Every module completed is a new skill unlocked
+              </p>
+
+              {/* Progress Bar */}
+              <Progress
+                value={
+                  (creatorModules.filter(
+                    (m) => m.progress_status === "completed"
+                  ).length /
+                    creatorModules.length) *
+                    100 || 0
+                }
+                className="h-3 rounded-full mb-0"
+                style={{
+                  backgroundColor: "#E5E7EB"
+                }}
+                indicatorClassName="bg-[#279AFF] rounded-full"
+              />
+
+              {/* Completion Text */}
+              <p className="text-xs text-black mt-2">
+                {
+                  creatorModules.filter(
+                    (m) => m.progress_status === "completed"
+                  ).length
+                }{" "}
+                of {creatorModules.length} Modules Completed
+              </p>
+            </>
+          )}
+        </Card>
+
+        {/* Rank */}
+        <Card
+          className="p-6 rounded-2xl flex flex-col items-center justify-center text-center"
+          style={{
+            background: "#fff",
+            border: "1px solid #98CFFE",
+            boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
+          }}
+        >
+          {loading ? (
+            <>
+              <Skeleton className="h-10 w-14 mb-2" />
+              <Skeleton className="h-4 w-20" />
+            </>
+          ) : myRank ? (
+            <>
+              <p
+                className="text-8xl font-semibold"
+                style={{ color: "#279AFF" }}
+              >
+                <span
+                  style={{
+                    fontSize: "4rem",
+                  }}
+                >
+                  #
+                </span>
+                {myRank}
+              </p>
+              <p className="text-base text-black mt-0 font-semibold ">
+                Your Rank
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500">Not ranked yet</p>
+          )}
         </Card>
 
         {/* Rewards */}
@@ -154,7 +212,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Badges */}
-        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
+        {/* <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
           <CardHeader>
             <CardTitle>Badges</CardTitle>
           </CardHeader>
@@ -174,31 +232,7 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">No badges yet</p>
             )}
           </CardContent>
-        </Card>
-
-        {/* Rank */}
-        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
-          <CardHeader>
-            <CardTitle>Your Rank</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <>
-                <Skeleton className="h-8 w-12 mb-2" />
-                <Skeleton className="h-4 w-20" />
-              </>
-            ) : myRank ? (
-              <>
-                <p className="text-3xl font-bold">#{myRank}</p>
-                <p className="text-sm text-muted-foreground">
-                  Among all creators
-                </p>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Not ranked yet</p>
-            )}
-          </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Enrolled Challenges */}
