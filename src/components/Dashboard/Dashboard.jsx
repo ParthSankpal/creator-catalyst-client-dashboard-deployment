@@ -69,7 +69,13 @@ export default function Dashboard() {
   return (
     <div className=" pt-6 space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Greeting */}
-      <h2 className="text-2xl font-bold">Hi, {user?.name} 👋</h2>
+      <h2 className="text-3xl font-semibold">
+        Welcome Back, {user?.name?.split(" ")[0]}!
+      </h2>
+      <p className="text-muted-foreground -mt-3">
+        Your next challenge is live, the leaderboard is waiting. Let’s see what
+        you’ve got today.
+      </p>
 
       {/* Progress, Rewards, Badges & Rank */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-5">
@@ -110,31 +116,39 @@ export default function Dashboard() {
         </Card>
 
         {/* Rewards */}
-        <Card className="p-4" style={{ border: "1px solid #98CFFE," }}>
-          <CardHeader>
-            <CardTitle>Current Coins</CardTitle>
+        <Card
+          className="p-6 rounded-2xl shadow-md"
+          style={{
+            background: "#fff",
+            border: "1px solid #98CFFE",
+            boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
+          }}
+        >
+          <CardHeader className="p-0 mb-2">
+            <CardTitle className="text-xl font-semibold text-black">
+              Your Coins
+            </CardTitle>
+            <p className="text-sm text-gray-500">
+              Stack ’em up! Every challenge completed adds to your treasure.
+            </p>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="p-0 mt-0 ml-1 mb-4">
             {loading ? (
               <>
                 <Skeleton className="h-8 w-16 mb-2" />
                 <Skeleton className="h-4 w-24" />
               </>
             ) : (
-              <>
-                <div className="flex items-center gap-2">
-                  <img src="/coin.png" alt="Coin" className="h-9" />
-                  <p
-                    className="text-4xl font-semibold"
-                    style={{ color: "#279AFF" }}
-                  >
-                    {rewards?.total_coins || 0}
-                  </p>
-                </div>
-                {/* <p className="text-sm text-muted-foreground">
-                  Points: {rewards?.total_points || 0}
-                </p> */}
-              </>
+              <div className="flex items-center gap-3">
+                <img src="/coin.png" alt="Coin" className="h-10" />
+                <p
+                  className="text-4xl font-semibold"
+                  style={{ color: "#279AFF" }}
+                >
+                  {rewards?.total_coins || 0}
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>
