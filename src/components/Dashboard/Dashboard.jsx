@@ -23,8 +23,6 @@ export default function Dashboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // console.log(creatorModules);
-
   useEffect(() => {
     async function fetchData() {
       try {
@@ -79,8 +77,8 @@ export default function Dashboard() {
         you’ve got today.
       </p>
 
-      {/* Progress, Rewards, Badges & Rank */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-5">
+      {/* Progress, Rewards, Rank */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-5 mb-0">
         {/* Progress */}
         <Card
           className="p-6 rounded-2xl"
@@ -98,33 +96,24 @@ export default function Dashboard() {
             </>
           ) : (
             <>
-              {/* Title */}
               <h2 className="text-xl font-semibold text-black mb-0">
                 Your Progress
               </h2>
-
-              {/* Subtext */}
               <p className="text-sm text-gray-500 mb-2">
                 Every module completed is a new skill unlocked
               </p>
-
-              {/* Progress Bar */}
               <Progress
                 value={
                   (creatorModules.filter(
                     (m) => m.progress_status === "completed"
                   ).length /
                     creatorModules.length) *
-                  100 || 0
+                    100 || 0
                 }
                 className="h-3 rounded-full mb-0"
-                style={{
-                  backgroundColor: "#E5E7EB",
-                }}
+                style={{ backgroundColor: "#E5E7EB" }}
                 indicatorClassName="bg-[#279AFF] rounded-full"
               />
-
-              {/* Completion Text */}
               <p className="text-xs text-black mt-2">
                 {
                   creatorModules.filter(
@@ -152,24 +141,18 @@ export default function Dashboard() {
               <Skeleton className="h-4 w-20" />
             </>
           ) : myRank ? (
-            <>
+            <div className="my-3.5">
               <p
-                className="text-8xl font-semibold"
+                className="text-7xl font-semibold"
                 style={{ color: "#279AFF" }}
               >
-                <span
-                  style={{
-                    fontSize: "4rem",
-                  }}
-                >
-                  #
-                </span>
+                <span style={{ fontSize: "3rem" }}>#</span>
                 {myRank}
               </p>
               <p className="text-base text-black mt-0 font-semibold ">
                 Your Rank
               </p>
-            </>
+            </div>
           ) : (
             <p className="text-sm text-gray-500">Not ranked yet</p>
           )}
@@ -192,7 +175,6 @@ export default function Dashboard() {
               Stack ’em up! Every challenge completed adds to your treasure.
             </p>
           </CardHeader>
-
           <CardContent className="p-0 mt-0 ml-1 mb-4">
             {loading ? (
               <>
@@ -212,219 +194,219 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+      </div>
 
-        {/* Badges */}
-        <Card
-          className="p-4 rounded-2xl"
-          style={{ border: "1px solid #98CFFE" }}
-        >
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-black">
-              Badges
-            </CardTitle>
-          </CardHeader>
+      {/* 🔹 Enrolled + Completed + Badges */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Enrolled Challenges (Left on desktop, last on mobile) */}
+        <div className="order-3 md:order-1 md:col-span-2 mt-7">
+          <div className="mb-10">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold text-[1.25rem]">
+                Currently Enrolled
+              </h3>
+              {enrolledChallenges.length > 5 && (
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/challenges">View More</Link>
+                </Button>
+              )}
+            </div>
 
-          <CardContent>
-            {loading ? (
-              <div className="grid grid-cols-2 gap-3">
-                {[...Array(2)].map((_, i) => (
-                  <Card key={i} className="p-3 flex flex-col items-center">
-                    <Skeleton className="h-8 w-8 mb-2" />
-                    <Skeleton className="h-4 w-20" />
-                  </Card>
-                ))}
-              </div>
-            ) : rewards?.badges?.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {rewards.badges.map((badge) => (
-                  <Card
-                    key={badge.id}
-                    className="p-4 flex flex-col items-center justify-center text-center hover:shadow-md transition rounded-xl"
-                    style={{ border: "1px solid #E5E7EB" }}
-                  >
-                    <div className="text-3xl">{badge.icon}</div>
-                    <p className="text-sm font-medium mt-2">{badge.label}</p>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">No badges yet</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Challenges Completed */}
-        <Card
-          className="p-6 rounded-2xl shadow-md"
-          style={{
-            background: "#fff",
-            border: "1px solid #98CFFE",
-            boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
-          }}
-        >
-          <CardHeader className="p-0 mb-2">
-            <CardTitle className="text-xl font-semibold text-black">
-              Challenges Completed
-            </CardTitle>
-            <p className="text-sm text-gray-500">
-              Each challenge completed brings you closer to mastery.
-            </p>
-          </CardHeader>
-
-          <CardContent className="p-0 mt-0 ml-1 mb-4">
-            {loading ? (
+            {enrolledChallenges.length > 0 ? (
               <>
-                <Skeleton className="h-8 w-16 mb-2" />
-                <Skeleton className="h-4 w-24" />
+                {/* Table for desktop */}
+                <div className="hidden md:block border rounded-xl overflow-hidden">
+                  {/* Header row */}
+                  <div
+                    className="grid grid-cols-4 gap-4 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600"
+                    style={{
+                      gridTemplateColumns: "2fr 1fr 1fr 1fr", // 🔹 Title wider than others
+                    }}
+                  >
+                    <div>Challenge</div>
+                    <div className="text-center">Reward</div>
+                    <div className="text-center">Deadline</div>
+                  </div>
+
+                  {/* Rows */}
+                  <div className="divide-y">
+                    {enrolledChallenges.map((ch) => (
+                      <div
+                        key={ch.challenge_id}
+                        className="grid grid-cols-4 gap-4 items-center px-4 py-3 hover:bg-gray-50 transition"
+                        style={{
+                          gridTemplateColumns: "2fr 1fr 1fr 1fr", // 🔹 Title wider than others
+                        }}
+                      >
+                        {/* Challenge Title (Desktop Table) */}
+                        <div className="font-medium text-gray-800">
+                          {ch.challenge_title.length > 27
+                            ? ch.challenge_title.slice(0, 27) + "..."
+                            : ch.challenge_title}
+                        </div>
+
+                        {/* Points */}
+                        <div className="text-center text-sm text-gray-700">
+                          <p className="text-[#0A84F1] font-semibold">
+                            {ch.reward_points} pts
+                          </p>
+                        </div>
+
+                        {/* Deadline */}
+                        <div className="text-center">
+                          <Badge variant="outline">
+                            {getTimeRemaining(ch.end_date)} left
+                          </Badge>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="flex justify-end">
+                          <a href={`/challenges/${ch.challenge_id}`}>
+                            <Button
+                              size="sm"
+                              className="rounded-full px-7 bg-[#1499FF] hover:cursor-pointer hover:bg-[#81C2FB]"
+                            >
+                              View
+                            </Button>
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cards for mobile */}
+                <div className="block md:hidden space-y-4">
+                  {enrolledChallenges.map((ch) => (
+                    <Card key={ch.challenge_id} className="p-4">
+                      <h4 className="font-semibold text-gray-900">
+                        {ch.challenge_title}
+                      </h4>
+                      <p className="text-xs text-gray-500 mb-2">
+                        {ch.target_city}
+                      </p>
+
+                      <div className="flex justify-between items-center text-sm mb-3">
+                        <span className="font-medium text-gray-700">
+                          {ch.reward_points} pts
+                        </span>
+                        <Badge variant="outline">
+                          {getTimeRemaining(ch.end_date)} left
+                        </Badge>
+                      </div>
+
+                      <a href={`/challenges/${ch.challenge_id}`}>
+                        <Button
+                          size="sm"
+                          className="rounded-full text-[15px] px-10 py-5 bg-[#1499FF] hover:cursor-pointer hover:bg-[#81C2FB]"
+                        >
+                          View
+                        </Button>
+                      </a>
+                    </Card>
+                  ))}
+                </div>
               </>
             ) : (
-              <div className="flex items-center gap-3">
-                <p
-                  className="text-4xl font-semibold"
-                  style={{ color: "#279AFF" }}
-                >
-                  {rewards?.challenges?.completed || 0}
+              <div className="flex flex-col items-center justify-center py-6">
+                <p className="text-muted-foreground mb-3">
+                  Ready for challenges? 🚀
                 </p>
+                <Button asChild>
+                  <Link href="/challenges">Explore Challenges</Link>
+                </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Enrolled Challenges */}
-      <div className="mb-10">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="font-semibold">Currently Enrolled</h3>
-          {enrolledChallenges.length > 2 && (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/challenges">View More</Link>
-            </Button>
-          )}
+          </div>
         </div>
 
-        {enrolledChallenges.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {enrolledChallenges.slice(0, 2).map((ch) => (
-                <Card key={ch.challenge_id} className="p-4">
-                  <h4 className="font-semibold">
-                    {ch.challenge_title} ({ch.target_city})
-                  </h4>
-                  <p className="text-sm text-muted-foreground">{ch.description}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <Badge variant="outline">{getTimeRemaining(ch.end_date)} left</Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {ch.points_earned}/{ch.reward_points} pts
-                    </span>
-                  </div>
+        {/* Right Side: Completed + Badges stacked */}
+        <div className="order-1 md:order-2 flex flex-col gap-6">
+          {/* Badges */}
+          <Card
+            className="relative p-6 rounded-2xl shadow-md overflow-hidden"
+            style={{
+              background: "#D1EAFF",
+              border: "1px solid #98CFFE",
+            }}
+          >
+            {/* Shimmer overlay */}
+            <div className="absolute inset-0 pointer-events-none shimmer-overlay" />
 
-                  {/* ✅ Redirect to challenge detail */}
-                  <Button asChild className="mt-3 w-full">
-                    <Link href={`/challenges/${ch.challenge_id}`}>Submit Video 🎥</Link>
-                  </Button>
-                </Card>
-              ))}
+            <CardHeader className="p-0 mb-2">
+              <CardTitle className="text-xl font-semibold text-[#0A84F1]">
+                Badges Earned
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <Skeleton className="h-12 w-12 mb-2 rounded-full" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  ))}
+                </div>
+              ) : rewards?.badges?.length > 0 ? (
+                <div className="flex flex-wrap gap-6">
+                  {rewards.badges.map((badge) => (
+                    <div
+                      key={badge.id}
+                      className="flex flex-col items-center justify-center text-center"
+                    >
+                      <img
+                        src={badge.icon}
+                        alt={badge.title}
+                        className="w-16 h-16 object-contain"
+                      />
+                      <p className="text-sm font-medium mt-2">{badge.label}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No badges yet</p>
+              )}
+            </CardContent>
+          </Card>
 
-            </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-6">
-            <p className="text-muted-foreground mb-3">
-              Ready for challenges? 🚀
-            </p>
-            <Button asChild>
-              <Link href="/challenges">Explore Challenges</Link>
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Submitted Challenges */}
-      <div className="mb-10">
-        <div className="flex justify-between items-center mb-3">
-          {submittedChallenges.length > 1 && (
-            <>
-              <h3 className="font-semibold">Your Submissions</h3>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/challenges">View More</Link>
-              </Button>
-            </>
-          )}
+          {/* Challenges Completed */}
+          <Card
+            className="p-6 rounded-2xl shadow-md"
+            style={{
+              background: "#fff",
+              border: "1px solid #98CFFE",
+              boxShadow: "0px 0px 10px 2px rgba(39, 154, 255, 0.1)",
+            }}
+          >
+            <CardHeader className="p-0 mb-2">
+              <CardTitle className="text-xl font-semibold text-black">
+                Challenges Completed
+              </CardTitle>
+              <p className="text-sm text-gray-500">
+                Each challenge completed brings you closer to mastery.
+              </p>
+            </CardHeader>
+            <CardContent className="p-0 mt-0 ml-1 mb-4">
+              {loading ? (
+                <>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                </>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <p
+                    className="text-4xl font-semibold"
+                    style={{ color: "#279AFF" }}
+                  >
+                    {rewards?.challenges?.completed || 0}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
-
-        {submittedChallenges.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {submittedChallenges.slice(0, 2).map((ch) => (
-              <Card key={ch.challenge_id} className="p-4">
-                <h4 className="font-semibold">{ch.challenge_title}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {ch.description}
-                </p>
-                <Button asChild variant="secondary" className="mt-3 w-full">
-                  <Link href={`/challenges/${ch.challenge_id}`}>View Submissions</Link>
-                </Button>
-              </Card>
-            ))}
-          </div>
-        ) : null}
       </div>
-
-      {/* Modules */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Your Modules 📚</CardTitle>
-            {creatorModules.length > 2 && (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/modules">View More</Link>
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-
-        <CardContent className="grid gap-3">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[...Array(2)].map((_, i) => (
-                <Card key={i} className="p-4">
-                  <Skeleton className="h-5 w-2/3 mb-2" />
-                  <Skeleton className="h-4 w-full mb-3" />
-                  <Skeleton className="h-3 w-1/2" />
-                </Card>
-              ))}
-            </div>
-          ) : creatorModules.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {creatorModules.slice(0, 2).map((m) => (
-                <Card
-                  key={m.module_id}
-                  className="p-4 hover:shadow-md cursor-pointer transition"
-                >
-                  <h4 className="font-medium">{m.title}</h4>
-                  <p className="text-sm text-muted-foreground">{m.documentation}</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <Progress
-                      value={m.progress_status === "completed" ? 100 : 0}
-                      className="w-2/3"
-                    />
-                    <span className="text-xs">
-                      {m.points_earned}/{m.reward_points_can_achieve} pts
-                    </span>
-                  </div>
-
-                  {/* ✅ Redirect to module detail */}
-                  <Button asChild variant="secondary" className="mt-3 w-full">
-                    <Link href={`/modules/${m.module_id}`}>View Module</Link>
-                  </Button>
-                </Card>
-              ))}
-
-            </div>
-          ) : (
-            <p className="text-muted-foreground">No modules assigned yet.</p>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
