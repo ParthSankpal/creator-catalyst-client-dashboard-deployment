@@ -9,7 +9,7 @@ export default function ProgressCard({ data }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Submissions */}
         <div className="text-center p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
-          <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
+          <div className="text-2xl font-semiboldboldbold text-emerald-700 dark:text-emerald-400">
             {data.submissions.count}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -25,7 +25,7 @@ export default function ProgressCard({ data }) {
 
         {/* Points */}
         <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-xl">
-          <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
+          <div className="text-2xl font-semiboldboldbold text-yellow-700 dark:text-yellow-400">
             {data.points.current}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -38,7 +38,7 @@ export default function ProgressCard({ data }) {
 
         {/* Rank */}
         <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
-          <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+          <div className="text-2xl font-semiboldboldbold text-purple-700 dark:text-purple-400">
             #{data.rank.current}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">

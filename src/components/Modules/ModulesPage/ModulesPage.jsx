@@ -1,45 +1,55 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { transformModulesData, calculateProgress } from "../../../utils/modules";
-import { getCreatorModules, getModules } from "../../../api/modules";
-
-// shadcn/ui
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  getModules,
+  getCreatorModules,
+  startModule,
+} from "@/src/api/modules";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import Tabs from "@/src/components/Tabs/Tabs";
+import Notification from "@/src/components/Notification/Notification";
 import ModuleCard from "../ModuleCard/ModuleCard";
-import ProgressCard from "../ProgressCard";
 
-const ModulesPage = () => {
-  const [allModules, setAllModules] = useState([]);
-  const [creatorModules, setCreatorModules] = useState([]);
-  const [progress, setProgress] = useState(null);
+export default function ModulesPage() {
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState("available");
+  const [notification, setNotification] = useState(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        // fetch both APIs in parallel
-        const [allRes, creatorRes] = await Promise.all([
+        const [allModulesRes, creatorModulesRes] = await Promise.all([
           getModules(),
           getCreatorModules(),
         ]);
 
-        console.log(allRes, creatorRes);
+        const allModules = allModulesRes?.data || [];
+        const creatorModules = creatorModulesRes?.data || [];
 
-        if (allRes.status === "success") {
-          setAllModules(transformModulesData(allRes.data, "all"));
-        }
+        // Map enrolled modules with progress
+        const enrolledMap = {};
+        creatorModules.forEach((m) => {
+          enrolledMap[m.module_id] = m;
+        });
 
-        if (creatorRes.status === "success") {
-          const transformed = transformModulesData(creatorRes.data, "creator");
-          setCreatorModules(transformed);
-          setProgress(calculateProgress(transformed));
-        }
+        const merged = allModules.map((mod) => ({
+          ...mod,
+          ...enrolledMap[mod.module_id], // overwrite with enrolled data if exists
+          progress_status: enrolledMap[mod.module_id]?.progress_status || "not_started",
+          points_earned: enrolledMap[mod.module_id]?.points_earned || 0,
+        }));
 
+        setModules(merged);
       } catch (err) {
         console.error("Error fetching modules:", err);
+        setNotification({ message: "Failed to load modules", type: "error" });
       } finally {
         setLoading(false);
       }
@@ -48,85 +58,84 @@ const ModulesPage = () => {
     fetchModules();
   }, []);
 
+  const handleStart = async (id) => {
+    try {
+      await startModule(id);
+      setNotification({ message: "Module started!", type: "success" });
+
+      setModules((prev) =>
+        prev.map((m) =>
+          m.module_id === id
+            ? { ...m, progress_status: "in_progress", points_earned: 0 }
+            : m
+        )
+      );
+
+      setTab("in_progress");
+    } catch (err) {
+      console.error(err);
+      setNotification({ message: "Failed to start module", type: "error" });
+    }
+  };
+
+  const tabs = [
+    { value: "available", label: "Available" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
+  ];
+
+  const availableModules = modules.filter((m) => m.progress_status === "not_started");
+  const inProgressModules = modules.filter((m) => m.progress_status === "in_progress");
+  const completedModules = modules.filter((m) => m.progress_status === "completed");
+
+  let filteredModules = [];
+  if (tab === "available") filteredModules = availableModules;
+  if (tab === "in_progress") filteredModules = inProgressModules;
+  if (tab === "completed") filteredModules = completedModules;
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        {[...Array(6)].map((_, i) => (
+          <Card key={i} className="p-4">
+            <Skeleton className="h-6 w-3/4 mb-4" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-2/3" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="page-content min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Learning Modules 📚
-          </h2>
-          <p className="mt-1 text-muted-foreground">
-            Master content creation through our structured program!
-          </p>
+    <div className="p-6">
+      <h2 className="text-2xl font-semiboldbold mb-6">📘 Modules</h2>
+
+      <Tabs tabs={tabs} activeTab={tab} onChange={setTab} />
+
+      {filteredModules.length === 0 ? (
+        <p className="text-muted-foreground mt-6">No modules here</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {filteredModules.map((mod) => (
+            <ModuleCard
+              key={mod.module_id}
+              {...mod}
+              tab={tab}
+              onStart={handleStart}
+              onView={() => router.push(`/modules/${mod.module_id}`)}
+            />
+          ))}
         </div>
+      )}
 
-        {/* Progress Summary */}
-        <div className="mb-8">
-          {loading ? (
-            <Card className="p-4">
-              <Skeleton className="h-6 w-1/3 mb-3" />
-              <Skeleton className="h-4 w-2/3" />
-            </Card>
-          ) : progress ? (
-            <ProgressCard progress={progress} />
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>No progress data available yet</CardTitle>
-              </CardHeader>
-              <CardContent>
-                Start a module to see your progress here.
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* All Modules */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-4">
-                <Skeleton className="h-6 w-2/3 mb-3" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-              </Card>
-            ))}
-          </div>
-        ) : allModules.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allModules.map((module) =>
-
-              // Show start option for not-started module
-              <Card key={module.id} className="flex flex-col justify-between">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">
-                    {module.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {module.documentation}
-                  </p>
-                </CardContent>
-                <div className="p-4">
-                  <Button variant="secondary" asChild className=" w-full">
-                    <a href={`/modules/${module.id}`}>view</a>
-                  </Button>
-                </div>
-              </Card>
-
-            )}
-          </div>
-        ) : (
-          <p className="text-center text-muted-foreground">
-            No modules available right now.
-          </p>
-        )}
-      </div>
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </div>
   );
-};
-
-export default ModulesPage;
+}

@@ -1,17 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getChallenges } from "../../../api/challenges";
-import { transformChallenges } from "../../../utils/challenges";
 import ChallengeCard from "../ChallengeCard/ChallengeCard";
 import Tabs from "../../Tabs/Tabs";
 import Loader from "../../Loader/Loader";
 
 export default function ChallengesPage() {
-  const [challenges, setChallenges] = useState({
-    active: { enrolled: [], others: [] },
-    upcoming: { enrolled: [], others: [] },
-    completed: { enrolled: [], others: [] },
-  });
+  const [challenges, setChallenges] = useState([]); // ✅ raw API data
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("active");
 
@@ -19,8 +14,7 @@ export default function ChallengesPage() {
     async function fetchData() {
       try {
         const raw = await getChallenges();
-        const transformed = transformChallenges(raw?.data || []);
-        setChallenges(transformed);
+        setChallenges(raw?.data || []); // ✅ no transform
       } catch (err) {
         console.error("Error fetching challenges:", err);
       } finally {
@@ -36,17 +30,30 @@ export default function ChallengesPage() {
     { value: "completed", label: "Completed" },
   ];
 
+  // ✅ Group challenges by enrolled vs others directly
+  const getGroupedChallenges = (type) => {
+    const filtered = challenges.filter((c) => c.challenge_status === type);
+
+    // 🔹 Sort latest first using challenge_created_at
+    const sorted = [...filtered].sort(
+      (a, b) => new Date(b.challenge_created_at) - new Date(a.challenge_created_at)
+    );
+
+    return {
+      enrolled: sorted.filter((c) => c.progress_status), // has progress = enrolled
+      others: sorted.filter((c) => !c.progress_status), // no progress = others
+    };
+  };
+
+  const grouped = getGroupedChallenges(tab);
+
   const renderChallengeSection = (title, list, type) =>
     list.length > 0 && (
       <>
         <h2 className="text-xl font-semibold mt-6 mb-3">{title}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {list.map((c, index) => (
-            <ChallengeCard
-              key={c.challenge_id || index}
-              type={type}
-              {...c}
-            />
+          {list.map((c) => (
+            <ChallengeCard key={c.challenge_id} type={type} {...c} />
           ))}
         </div>
       </>
@@ -54,7 +61,7 @@ export default function ChallengesPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">🚀 Challenges</h1>
+      <h1 className="text-2xl font-semibold mb-6">🚀 Challenges</h1>
 
       {/* Tabs */}
       <Tabs tabs={tabs} activeTab={tab} onChange={setTab} />
@@ -62,21 +69,12 @@ export default function ChallengesPage() {
       {/* Content */}
       {loading ? (
         <div><Loader /></div>
-      ) : challenges[tab].enrolled.length === 0 &&
-        challenges[tab].others.length === 0 ? (
+      ) : grouped.enrolled.length === 0 && grouped.others.length === 0 ? (
         <p className="text-gray-500">No {tab} challenges.</p>
       ) : (
         <>
-          {renderChallengeSection(
-            "✅ Enrolled Challenges",
-            challenges[tab].enrolled,
-            tab
-          )}
-          {renderChallengeSection(
-            "📌 Other Challenges",
-            challenges[tab].others,
-            tab
-          )}
+          {renderChallengeSection("✅ Enrolled Challenges", grouped.enrolled, tab)}
+          {renderChallengeSection("📌 Other Challenges", grouped.others, tab)}
         </>
       )}
     </div>

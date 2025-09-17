@@ -1,275 +1,264 @@
-"use client"
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   getChallengeById,
   submitChallenge,
-  startChallenge,
-  getCreatorChallengeSubmissions,
-} from "@/src/api/challenges"
+} from "@/src/api/challenges";
+import Notification from "@/src/components/Notification/Notification";
+import { ChevronLeft } from "lucide-react";
 
-import SubmitChallengeModal from "../SubmitChallengeModal/SubmitChallengeModal"
+// ✅ Extract YouTube Video ID
+function getYouTubeId(url) {
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname === "youtu.be") {
+      return parsedUrl.pathname.slice(1);
+    }
+    return parsedUrl.searchParams.get("v");
+  } catch {
+    return null;
+  }
+}
 
-// utils
-import {
-  getChallengeStatus,
-  getTimeRemaining,
-  formatDuration,
-  getChallengeColors,
-  getEmojiForChallenge,
-} from "@/src/utils/challenges"
-import Loader from "../../Loader/Loader"
-import PreviousSubmissionsModal from "../PreviousSubmissionsModal/PreviousSubmissionsModal"
+// ✅ Map status to badge styles
+function getStatusBadge(status) {
+  switch (status) {
+    case "accepted":
+      return <Badge className="bg-green-500 text-white">✅ Accepted</Badge>;
+    case "rejected":
+      return <Badge className="bg-red-500 text-white">❌ Rejected</Badge>;
+    default:
+      return <Badge className="bg-gray-400 text-white">⏳ Pending</Badge>;
+  }
+}
 
 export default function ChallengeDetail() {
-  const { id } = useParams()
-  const [challenge, setChallenge] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [starting, setStarting] = useState(false)
-  const [showSubmitModal, setShowSubmitModal] = useState(false)
-  const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
-  const [submissions, setSubmissions] = useState([])
+  const { id } = useParams();
+  const router = useRouter();
 
-  // 🔹 Refetch wrapper
+  const [challenge, setChallenge] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [url, setUrl] = useState("");
+  const [hashtags, setHashtags] = useState("");
+  const [city, setCity] = useState("");
+  const [notification, setNotification] = useState(null);
+
   const fetchChallenge = async () => {
-    setLoading(true)
     try {
-      const res = await getChallengeById(id)
-
-      console.log(res.data);
-      
-      setChallenge(res?.data)
-    } catch (err) {
-      console.error("Failed to fetch challenge", err)
+      const res = await getChallengeById(id);
+      setChallenge(res.data);
+      setHashtags(res.data?.hashtags || "");
+    } catch (error) {
+      console.error("Error fetching challenge:", error);
+      setNotification({ message: "Failed to fetch challenge", type: "error" });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (id) fetchChallenge()
-  }, [id])
+    fetchChallenge();
+  }, [id]);
 
-  const handleStart = async () => {
-    setStarting(true)
-    try {
-      await startChallenge(challenge.challenge_id)
-      await fetchChallenge() // ✅ Refetch latest state
-    } catch (err) {
-      console.error("Failed to start challenge ❌", err)
-      alert("Could not start challenge")
-    } finally {
-      setStarting(false)
+  const handleSubmit = async () => {
+    if (!url) {
+      setNotification({ message: "Please enter a submission URL", type: "error" });
+      return;
     }
-  }
-
-  const handleSubmit = async (data) => {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      const payload = new URLSearchParams()
-      payload.append("submission", data.submission)
-      payload.append("hashtags", data.hashtags)
-      payload.append("city", data.city)
+      const payload = new URLSearchParams();
+      payload.append("submission", url);
+      payload.append("hashtags", hashtags);
+      payload.append("city", city);
 
-      await submitChallenge(challenge.challenge_id, payload)
-      alert("Challenge submitted ✅")
-      setShowSubmitModal(false)
-      await fetchChallenge() // ✅ Refetch after submit
+      await submitChallenge(challenge.challenge_id, payload);
+      setNotification({ message: "Submission successful!", type: "success" });
+      setUrl("");
+      setCity("");
+      await fetchChallenge(); // ✅ Re-fetch challenge data
     } catch (err) {
-      console.error("Submit error:", err)
-      alert("Failed to submit challenge ❌")
+      console.error(err);
+      setNotification({ message: "Submission failed", type: "error" });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
-
-  const handleViewSubmissions = async (id) => {
-    try {      
-      const res = await getCreatorChallengeSubmissions(id)
-      console.log(res?.data, "getCreatorChallengeSubmissions");
-      
-      setShowSubmissionsModal(true)
-      setSubmissions(res?.data || [])
-    } catch (err) {
-      console.error("Error fetching submissions:", err)
-      setSubmissions([])
-    } 
-  }
-
-  // 🔹 Loading skeleton
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-1/3 mb-2" />
-            <div className="flex gap-2">
-              <Skeleton className="h-6 w-16" />
-              <Skeleton className="h-6 w-24" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-20 w-full" />
-          </CardContent>
-        </Card>
+      <div className="flex gap-6 p-6">
+        <div className="w-2/3">
+          <Skeleton className="w-full h-64 mb-4" />
+          <Skeleton className="w-1/2 h-6" />
+        </div>
+        <div className="w-1/3">
+          <Skeleton className="w-3/4 h-8 mb-4" />
+          <Skeleton className="w-full h-20" />
+        </div>
       </div>
-    )
+    );
   }
 
   if (!challenge) {
-    return <p className="text-center mt-8">No challenge found ❌</p>
+    return <p className="p-6 text-red-500">Challenge not found</p>;
   }
 
-  // ✅ Enrich challenge with utils
-  const status = getChallengeStatus(challenge)
-  const { borderColor, badgeColor } = getChallengeColors(status)
-  const timeRemaining = getTimeRemaining(challenge.end_date)
-  const duration = formatDuration(challenge.start_date, challenge.end_date)
-  const emoji = getEmojiForChallenge(
-    challenge.challenge_title,
-    challenge.difficulty_level
-  )
+  // 🔹 Sort submissions latest first
+  const sortedSubmissions = [...(challenge.submissions || [])].sort(
+    (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at)
+  );
 
   return (
-
-    <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className=" flex justify-end">
-        {challenge.submissions?.length > 0 && (
-          <Button
-            variant="outline"
-            className=" cursor-pointer"
-            onClick={() => handleViewSubmissions(id)}
-          >
-            View Submissions
-          </Button>
-        )}
+    <div>
+      {/* Back Button */}
+      <div
+        className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground"
+        onClick={() => router.push("/challenges")}
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <span>Back</span>
       </div>
-      <div className="max-w-3xl mx-auto p-6">
-        {(submitting || starting) && <Loader />}
 
+      <div className="flex flex-col md:flex-row gap-6 p-6">
+        {/* Left Section */}
+        <div className="w-full md:w-2/3 space-y-4">
+          {/* Title */}
+          <h1 className="text-2xl font-semibold">{challenge.challenge_title}</h1>
 
+          {/* Description */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {challenge.description || "No description available"}
+              </p>
+            </CardContent>
+          </Card>
 
+          {/* Challenge Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Details</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+              <p><strong>Start Date:</strong> {challenge.start_date}</p>
+              <p><strong>End Date:</strong> {challenge.end_date}</p>
+              <p><strong>Reward:</strong> {challenge.reward_points} pts / {challenge.reward_coins} coins</p>
+              <p><strong>Difficulty:</strong> {challenge.difficulty_level}</p>
+              {challenge.location && <p><strong>Location:</strong> {challenge.location}</p>}
+              {challenge.hashtags && <p><strong>Hashtags:</strong> {challenge.hashtags}</p>}
+              <p><strong>Category:</strong> {challenge.category}</p>
+              <p><strong>Status:</strong> {challenge.challenge_status}</p>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className={`shadow-lg border-2 ${borderColor}`}>
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold flex items-center gap-2">
-              {emoji} {challenge.challenge_title}
-            </CardTitle>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <Badge className={badgeColor}>{status}</Badge>
-              <Badge variant="secondary">{challenge.category}</Badge>
-              <Badge variant="outline">
-                Difficulty: {challenge.difficulty_level}
-              </Badge>
-              {challenge.location && (
-                <Badge variant="outline">{challenge.location}</Badge>
-              )}
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground leading-relaxed">
-              {challenge.description}
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="font-medium">Start Date</p>
-                <p>{challenge.start_date}</p>
-              </div>
-              <div>
-                <p className="font-medium">End Date</p>
-                <p>{challenge.end_date}</p>
-              </div>
-              <div>
-                <p className="font-medium">Duration</p>
-                <p>{duration}</p>
-              </div>
-              <div>
-                <p className="font-medium">Time Left</p>
-                <p>{timeRemaining}</p>
-              </div>
-              <div>
-                <p className="font-medium">Reward Points</p>
-                <p>{challenge.reward_points}</p>
-              </div>
-              <div>
-                <p className="font-medium">Reward Coins</p>
-                <p>{challenge.reward_coins}</p>
-              </div>
-            </div>
-
-            {challenge.hastags && (
-              <div>
-                <p className="font-medium">Hashtags</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {challenge.hastags}
-                </p>
-              </div>
-            )}
-
-            <div className="mt-6 flex gap-4 justify-end">
-              {challenge.progress_status === "not_started" && (
-                <Button onClick={handleStart} disabled={starting}>
-                  {starting ? "Starting..." : "Start Challenge"}
-                </Button>
-              )}
-
-
-
-              {challenge.progress_status === "completed" && (
-                <Badge className="bg-green-500 text-white">
-                  ✅ Challenge Completed
-                </Badge>
-              )}
-
-              {challenge.progress_status !== "not_started" && (
-                <Button
-                  onClick={() => setShowSubmitModal(true)}
-                  disabled={submitting}
-                >
-                  {challenge.submissions?.length > 0
-                    ? "Add Another Submission"
-                    : "Submit Challenge"}
-                </Button>
-              )}
-
-
-
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Submit Modal */}
-        <SubmitChallengeModal
-          open={showSubmitModal}
-          onClose={setShowSubmitModal}
-          location={challenge.location}
-          onSubmit={handleSubmit}
-          hashTags={challenge.hastags}
-          loading={submitting}
-        />
-
-        {/* Previous Submissions Modal */}
-        <PreviousSubmissionsModal
-          open={showSubmissionsModal}
-          onClose={() => setShowSubmissionsModal(false)}
-          submissions={submissions || []}
-          challenge={challenge}
-        />
-
+        {/* Right Section (Submission Form) */}
+        <div className="w-full md:w-1/3 pt-10 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Submit Challenge</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Input
+                placeholder="Enter submission URL"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <Input
+                placeholder="Hashtags"
+                value={hashtags}
+                onChange={(e) => setHashtags(e.target.value)}
+              />
+              <Input
+                placeholder="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+              <Button
+                onClick={handleSubmit}
+                className="w-full cursor-pointer"
+                disabled={submitting}
+              >
+                {submitting ? "Submitting..." : "Submit"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {/* Bottom Submissions */}
+      {sortedSubmissions.length > 0 && (
+        <div className="p-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Submissions</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {sortedSubmissions.map((sub, idx) => {
+                const videoId = getYouTubeId(sub.submission_url);
+                return (
+                  <div key={idx} className="space-y-2 border rounded-lg p-3">
+                    {videoId ? (
+                      <iframe
+                        width="100%"
+                        height="250"
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title="Submission Video"
+                        className="rounded-lg"
+                        allowFullScreen
+                      ></iframe>
+                    ) : (
+                      <a
+                        href={sub.submission_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-blue-600 text-sm underline"
+                      >
+                        {sub.submission_url}
+                      </a>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-2">
+                        {getStatusBadge(sub.status)}
+                        {sub.accept_status ? (
+                          <Badge className="bg-blue-500 text-white">✔ Reviewed</Badge>
+                        ) : (
+                          <Badge className="bg-yellow-500 text-white">⏳ Not Reviewed</Badge>
+                        )}
+                      </div>
+                      <Badge variant="outline">{sub.points_awarded} pts</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Submitted at: {new Date(sub.submitted_at).toLocaleString()}
+                    </p>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </div>
-  )
+  );
 }

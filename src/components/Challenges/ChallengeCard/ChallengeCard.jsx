@@ -11,124 +11,170 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { startChallenge } from "@/src/api/challenges";
+import { useState } from "react";
 
 export default function ChallengeCard(props) {
   const router = useRouter();
   const {
     challenge_id,
-    type,
-    title,
+    challenge_status, // "active" | "upcoming" | "completed"
+    challenge_title,
     description,
-    emoji,
-    badgeColor,
-    timeLeft,
-    reward,
-    participants,
-    rank,
-    points,
-    expectedReward,
-    duration,
-    status,
-
-    // 🔹 progress + submissions
+    reward_points,
+    reward_coins,
+    difficulty_level,
+    location,
+    category,
+    progress_status, // "not_started" | "in_progress" | "completed"
     progress_started_at,
     progress_updated_at,
     submissions,
+    points_earned,
+    start_date,
+    end_date,
   } = props;
+
+  const [starting, setStarting] = useState(false);
 
   const handleView = () => {
     router.push(`/challenges/${challenge_id}`);
   };
 
+  const handleStart = async () => {
+    setStarting(true);
+    try {
+      await startChallenge(challenge_id);
+      router.push(`/challenges/${challenge_id}`); // redirect after start
+    } catch (err) {
+      console.error("Failed to start challenge:", err);
+      alert("Failed to start challenge ❌");
+    } finally {
+      setStarting(false);
+    }
+  };
+
+  // 🔹 Pick latest submission if exists
+  let latestSubmission = null;
+  if (submissions?.length > 0) {
+    latestSubmission = [...submissions].sort(
+      (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at)
+    )[0];
+  }
+
   return (
-    <Card className="transition hover:shadow-lg hover:scale-[1.02] duration-200">
-      <CardHeader className="flex flex-row items-center justify-between">
-        {(type === "active" || type === "completed" || type === "upcoming") && (
-          <Badge
-            className={`text-xs font-medium ${badgeColor}`}
-            variant="secondary"
-          >
-            {timeLeft || status}
+    <Card className="transition flex flex-col justify-between hover:shadow-lg hover:scale-[1.02] duration-200">
+      <div>
+
+        <CardHeader className="flex flex-row items-center justify-between">
+          <Badge className="text-sm font-medium" variant="secondary">
+            {challenge_status}
           </Badge>
-        )}
-        <span className="text-2xl">{emoji}</span>
-      </CardHeader>
+          {/* Show submission accept_status if available */}
+          {latestSubmission && (
+            <div className=" flex items-center gap-2 text-sm">
+              {latestSubmission.accept_status ? (
+                <Badge className="bg-green-500 text-white">✔ Reviewed</Badge>
+              ) : (
+                <Badge className="bg-yellow-500 text-white">⏳ Under Review</Badge>
+              )}
+              
+            </div>
+          )}
+        </CardHeader>
 
-      <CardContent>
-        <CardTitle className="text-lg font-semibold mb-1">{title}</CardTitle>
-        <CardDescription className="mb-4">{description}</CardDescription>
+        <CardContent className=" pt-4">
+          <CardTitle className="text-lg font-semibold mb-1">
+            {challenge_title}
+          </CardTitle>
+          <CardDescription className="mb-4">{description}</CardDescription>
 
-        {/* Active */}
-        {type === "active" && (
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Participants</span>
-              <span className="font-medium">{participants}</span>
+          {/* Active */}
+          {challenge_status === "active" && (
+            <div className="space-y-2 mb-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Reward</span>
+                <span className="font-medium text-emerald-600">
+                  {reward_points} pts / {reward_coins} coins
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Difficulty</span>
+                <span className="font-medium">{difficulty_level}</span>
+              </div>
+              {location && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Location</span>
+                  <span className="font-medium">{location}</span>
+                </div>
+              )}
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Reward</span>
-              <span className="font-medium text-emerald-600">{reward}</span>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Completed */}
-        {type === "completed" && (
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Your Rank</span>
-              <span className="font-medium text-green-600">{rank}</span>
+          {/* Completed */}
+          {challenge_status === "completed" && (
+            <div className="space-y-2 mb-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Points Earned</span>
+                <span className="font-medium text-green-600">{points_earned}</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Points Earned</span>
-              <span className="font-medium text-green-600">{points}</span>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Upcoming */}
-        {type === "upcoming" && (
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Expected Reward</span>
-              <span className="font-medium text-purple-600">
-                {expectedReward}
-              </span>
+          {/* Upcoming */}
+          {challenge_status === "upcoming" && (
+            <div className="space-y-2 mb-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Start</span>
+                <span className="font-medium">{start_date}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">End</span>
+                <span className="font-medium">{end_date}</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Duration</span>
-              <span className="font-medium">{duration}</span>
-            </div>
-          </div>
-        )}
-      </CardContent>
+          )}
+
+          
+        </CardContent>
+      </div>
 
       <CardFooter className="flex gap-2">
         {/* 🔹 Active */}
-        {type === "active" && (
+        {challenge_status === "active" && (
           <>
-            <Button
-              variant="secondary"
-              className="flex-1 cursor-pointer"
-              onClick={handleView}
-            >
-              View
-            </Button>
-
-            {(progress_started_at ||
-              progress_updated_at ||
-              submissions?.length > 0) && (
-              <Button className="flex-1 cursor-pointer">
-                {submissions?.length > 0
-                  ? "Add Another Submission"
-                  : "Submit Entry"}
+            {progress_status === "not_started" ? (
+              <Button
+                className="flex-1 cursor-pointer"
+                onClick={handleStart}
+                disabled={starting}
+              >
+                {starting ? "Starting..." : "Start"}
               </Button>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  className="flex-1 cursor-pointer"
+                  onClick={handleView}
+                >
+                  View
+                </Button>
+                <Button
+                  className="flex-1 cursor-pointer"
+                  onClick={handleView}
+                >
+                  {submissions?.length > 0
+                    ? "View Submission(s)"
+                    : "Submit Entry"}
+                </Button>
+              </>
             )}
           </>
         )}
 
         {/* 🔹 Completed */}
-        {type === "completed" && (
+        {challenge_status === "completed" && (
           <>
             {submissions?.length > 0 ? (
               <Button
@@ -147,7 +193,7 @@ export default function ChallengeCard(props) {
         )}
 
         {/* 🔹 Upcoming */}
-        {type === "upcoming" && (
+        {challenge_status === "upcoming" && (
           <>
             <Button
               variant="secondary"

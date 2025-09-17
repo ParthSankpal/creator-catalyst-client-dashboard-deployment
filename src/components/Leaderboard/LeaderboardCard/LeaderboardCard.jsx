@@ -7,10 +7,10 @@ export default function LeaderboardCard({ rank, name, location, points, trend, h
           : "hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
     >
-      <div className={`w-8 text-center font-bold ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-200"}`}>
+      <div className={`w-8 text-center font-semiboldbold ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-200"}`}>
         {rank}
       </div>
-      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+      <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semiboldbold">
         {name[0]}
       </div>
       <div className="flex-1">
@@ -18,7 +18,7 @@ export default function LeaderboardCard({ rank, name, location, points, trend, h
         <div className="text-sm text-gray-500 dark:text-gray-400">{location}</div>
       </div>
       <div className="text-right">
-        <div className={`font-bold ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-200"}`}>
+        <div className={`font-semiboldbold ${highlight ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-200"}`}>
           {points} pts
         </div>
         <div className="text-xs text-emerald-600 dark:text-emerald-400">{trend}</div>

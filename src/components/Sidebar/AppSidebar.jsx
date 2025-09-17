@@ -42,7 +42,7 @@ export default function AppSidebar() {
     <Sidebar  collapsible="icon" className="border-r">
       {/* Header / Logo */}
       <SidebarHeader className="flex items-center justify-center py-4">
-        <span className="font-bold text-lg">LOGO</span>
+        <span className="font-semibold text-lg">LOGO</span>
       </SidebarHeader>
 
       <SidebarContent className="sidebaricons flex-none items-start">

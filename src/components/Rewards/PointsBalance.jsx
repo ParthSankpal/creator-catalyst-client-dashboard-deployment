@@ -7,7 +7,7 @@ const PointsBalance = () => {
                 Points Balance
             </h3>
             <div className="flex flex-col items-center gap-1 mb-4">
-                <span className="text-4xl font-bold text-emerald-700">260</span>
+                <span className="text-4xl font-semibold text-emerald-700">260</span>
                 <p className="text-sm">Available Points</p>
             </div>
             <div className="flex flex-col gap-2">

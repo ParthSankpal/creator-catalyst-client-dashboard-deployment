@@ -23,6 +23,8 @@ export default function Dashboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  console.log(creatorModules);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -113,7 +115,7 @@ export default function Dashboard() {
                     (m) => m.progress_status === "completed"
                   ).length /
                     creatorModules.length) *
-                    100 || 0
+                  100 || 0
                 }
                 className="h-3 rounded-full mb-0"
                 style={{
@@ -308,20 +310,21 @@ export default function Dashboard() {
                   <h4 className="font-semibold">
                     {ch.challenge_title} ({ch.target_city})
                   </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {ch.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{ch.description}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <Badge variant="outline">
-                      {getTimeRemaining(ch.end_date)} left
-                    </Badge>
+                    <Badge variant="outline">{getTimeRemaining(ch.end_date)} left</Badge>
                     <span className="text-xs text-muted-foreground">
                       {ch.points_earned}/{ch.reward_points} pts
                     </span>
                   </div>
-                  <Button className="mt-3 w-full">Submit Video 🎥</Button>
+
+                  {/* ✅ Redirect to challenge detail */}
+                  <Button asChild className="mt-3 w-full">
+                    <Link href={`/challenges/${ch.challenge_id}`}>Submit Video 🎥</Link>
+                  </Button>
                 </Card>
               ))}
+
             </div>
           </>
         ) : (
@@ -358,9 +361,7 @@ export default function Dashboard() {
                   {ch.description}
                 </p>
                 <Button asChild variant="secondary" className="mt-3 w-full">
-                  <Link href={`/challenges/${ch.challenge_id}`}>
-                    View Submissions
-                  </Link>
+                  <Link href={`/challenges/${ch.challenge_id}`}>View Submissions</Link>
                 </Button>
               </Card>
             ))}
@@ -400,9 +401,7 @@ export default function Dashboard() {
                   className="p-4 hover:shadow-md cursor-pointer transition"
                 >
                   <h4 className="font-medium">{m.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {m.documentation}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{m.documentation}</p>
                   <div className="flex justify-between items-center mt-2">
                     <Progress
                       value={m.progress_status === "completed" ? 100 : 0}
@@ -412,8 +411,14 @@ export default function Dashboard() {
                       {m.points_earned}/{m.reward_points_can_achieve} pts
                     </span>
                   </div>
+
+                  {/* ✅ Redirect to module detail */}
+                  <Button asChild variant="secondary" className="mt-3 w-full">
+                    <Link href={`/modules/${m.module_id}`}>View Module</Link>
+                  </Button>
                 </Card>
               ))}
+
             </div>
           ) : (
             <p className="text-muted-foreground">No modules assigned yet.</p>

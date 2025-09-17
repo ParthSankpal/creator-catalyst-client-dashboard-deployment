@@ -25,10 +25,18 @@ export const completeModule = async (id) => {
 };
 
 // ✅ Submit YouTube links for a module
-export const submitModule = async (id, payload) => {
-  const res = await axiosClient.post(`/api/moduleSubmit/${id}`, payload);
+export const submitModule = async (id, url) => {
+  const formData = new URLSearchParams();
+  formData.append("submission", url);
+
+  const res = await axiosClient.post(`/api/moduleSubmit/${id}`, formData, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
   return res.data;
 };
+
 
 // ✅ Get all submissions of a challenge (for creator)
 export const getCreatorModulSubmissions = async (id) => {

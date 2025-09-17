@@ -1,5 +1,9 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
+
 
 /* Define CSS variables for light theme */
 
@@ -50,6 +54,8 @@
 
 body {
   transition: background 0.3s ease, color 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
 }
 
 :root {
@@ -125,6 +131,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -138,13 +145,33 @@ body {
 
 
 @keyframes bell-shake {
-  0% { transform: rotate(0); }
-  15% { transform: rotate(30deg); }
-  30% { transform: rotate(-20deg); }
-  45% { transform: rotate(10deg); }
-  60% { transform: rotate(-20deg); }
-  75% { transform: rotate(5deg); }
-  100% { transform: rotate(0); }
+  0% {
+    transform: rotate(0);
+  }
+
+  15% {
+    transform: rotate(30deg);
+  }
+
+  30% {
+    transform: rotate(-20deg);
+  }
+
+  45% {
+    transform: rotate(10deg);
+  }
+
+  60% {
+    transform: rotate(-20deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
 }
 
 .animate-bell-shake {

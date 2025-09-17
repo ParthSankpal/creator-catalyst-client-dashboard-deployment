@@ -46,7 +46,7 @@ export default function NotificationsDropdown() {
         <button className="relative p-2 rounded-md text-gray-500 hover:text-foreground">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-semibold">
               {unreadCount}
             </span>
           )}

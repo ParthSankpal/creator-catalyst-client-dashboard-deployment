@@ -1,6 +1,7 @@
 import { getToken } from "firebase/messaging";
 import { CreatorSubscribe } from "../api/notificationApi";
 import { messaging } from "./firebase.config";
+import { setCookie } from "./cookieHandler";
 
 export const generateFirebaseMessageToken = async () => {
   try {
@@ -13,6 +14,8 @@ export const generateFirebaseMessageToken = async () => {
       });
 
       if (token) {
+
+        setCookie("fcm_token", token, { expires: 7 });
         const dedviceToken = new URLSearchParams();
         dedviceToken.append("token", token);
 
