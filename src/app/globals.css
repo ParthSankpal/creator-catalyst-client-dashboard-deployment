@@ -1,9 +1,7 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
-
 
 /* Define CSS variables for light theme */
 
@@ -54,7 +52,7 @@
 
 body {
   transition: background 0.3s ease, color 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 400;
 }
 
@@ -143,7 +141,6 @@ body {
   justify-content: center;
 }
 
-
 @keyframes bell-shake {
   0% {
     transform: rotate(0);
@@ -176,4 +173,23 @@ body {
 
 .animate-bell-shake {
   animation: bell-shake 1s ease-in-out;
+}
+
+.shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
