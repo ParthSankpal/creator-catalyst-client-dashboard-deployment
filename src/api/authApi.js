@@ -9,7 +9,7 @@ export const startGoogle = () => {
 
 export const getUser = async () => {
   const res = await axiosClient.get("/api/auth/getUser");
-  console.log("getUser response:", res);
+  // console.log("getUser response:", res);
   return res.data; // { user }
 };
 

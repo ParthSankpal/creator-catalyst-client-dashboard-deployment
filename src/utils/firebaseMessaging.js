@@ -6,7 +6,7 @@ import { setCookie } from "./cookieHandler";
 export const generateFirebaseMessageToken = async () => {
   try {
     const permission = await Notification.requestPermission();
-    console.log("🔔 Notification permission:", permission);
+    // console.log("🔔 Notification permission:", permission);
 
     if (permission === "granted") {
       const token = await getToken(messaging, {

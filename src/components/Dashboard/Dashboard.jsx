@@ -23,7 +23,7 @@ export default function Dashboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log(creatorModules);
+  // console.log(creatorModules);
 
   useEffect(() => {
     async function fetchData() {

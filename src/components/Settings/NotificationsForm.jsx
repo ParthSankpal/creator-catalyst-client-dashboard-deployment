@@ -21,10 +21,10 @@ export default function NotificationsForm() {
       const token = { topic: key }; // sending key as topic (adjust if needed)
       if (newValue) {
         await CreatorSubscribe(token);
-        console.log("Subscribed to:", key);
+        // console.log("Subscribed to:", key);
       } else {
         await CreatorUnsubscribe(token);
-        console.log("Unsubscribed from:", key);
+        // console.log("Unsubscribed from:", key);
       }
     } catch (err) {
       console.error("Error updating preference:", err);

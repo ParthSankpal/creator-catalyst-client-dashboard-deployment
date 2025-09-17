@@ -18,7 +18,7 @@ function textPage() {
     // useEffect(() => {
     //     generateFirebaseMessageToken();
     //     onMessage(messaging, payload => {
-    //         console.log(payload)
+    //         // console.log(payload)
     //     })
     // }, [])
 
@@ -33,7 +33,7 @@ function textPage() {
 
        
         const unsubscribe = onMessage(messaging, (payload) => {
-            console.log("📩 FCM Payload:", payload);
+            // console.log("📩 FCM Payload:", payload);
         });
 
        
@@ -59,7 +59,7 @@ function textPage() {
             },
             body: JSON.stringify({ ...formData, link: "/contact" })
         })
-        console.log(response);
+        // console.log(response);
     }
 
     return (

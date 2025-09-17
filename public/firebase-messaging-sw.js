@@ -20,7 +20,7 @@ const messaging = firebase.messaging();
 
 // Handle background messages
 // messaging.onBackgroundMessage((payload) => {
-//     console.log('[firebase-messaging-sw.js] Received background message:', payload);
+//     // console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
 //     // Extract notification data
 //     const { notification, data } = payload;
@@ -52,7 +52,7 @@ const messaging = firebase.messaging();
 
 // Handle notification click events
 self.addEventListener('notificationclick', (event) => {
-    console.log('[firebase-messaging-sw.js] Notification click received.');
+    // // console.log('[firebase-messaging-sw.js] Notification click received.');
 
     event.notification.close();
 

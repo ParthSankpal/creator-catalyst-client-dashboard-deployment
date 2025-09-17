@@ -8,7 +8,7 @@ import { getLeaderboard } from "@/src/api/leaderboardApi";
 
 export default function LeaderboardPage() {
   const user = useSelector((state) => state.user.user); 
-  console.log(user);
+  // // // // // console.log(user);
   
   const [leaderboard, setLeaderboard] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -20,7 +20,7 @@ export default function LeaderboardPage() {
         const res = await getLeaderboard();
         const apiData = res.data || [];
 
-        console.log(apiData);
+        // console.log(apiData);
         
 
         // map API response into UI-friendly structure
@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
 
         // find current logged-in user
         const me = mapped.find((u) => u.id === user?.id);
-        console.log(me, "current logged-in user");
+        // console.log(me, "current logged-in user");
         
         setCurrentUser(me || null);
       } catch (error) {

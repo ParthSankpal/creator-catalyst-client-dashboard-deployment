@@ -16,7 +16,6 @@ export default function SettingsPage() {
   const [notification, setNotification] = useState(null);
 
   const fcmToken = useMemo(() => getCookie("fcm_token"), []);
-  console.log(fcmToken, "fcm_token");
 
   useEffect(() => {
     const fetchUser = async () => {
