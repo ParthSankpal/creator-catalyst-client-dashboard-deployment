@@ -48,7 +48,6 @@ export default function ChallengesPage() {
   const grouped = getGroupedChallenges(tab);
 
   const renderChallengeSection = ( list, type) =>
-  const renderChallengeSection = ( list, type) =>
     list.length > 0 && (
       <>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

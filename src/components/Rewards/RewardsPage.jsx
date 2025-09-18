@@ -185,23 +185,7 @@ export default function RewardsPage() {
         </Card>
       )}
 
-      {/* Weekly Activities Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>This Week's Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Points Earned</p>
-            <p className="font-semibold">{points.points_earned_this_week}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Coins Earned</p>
-            <p className="font-semibold">{points.coins_earned_this_week}</p>
-          </div>
-        </CardContent>
-      </Card>
-
+     
       {/* Recent Activities */}
       <Card>
         <CardHeader>

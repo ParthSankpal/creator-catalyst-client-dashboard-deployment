@@ -60,10 +60,7 @@ export default function ModuleCard({
             <div className=" mb-3">
               {description || "No description available"}
             </div>
-            <div className=" line-clamp-4">
-
-              {documentation || "No description available"}
-            </div>
+            
           </CardDescription>
 
           {tab !== "available" && (
