@@ -14,6 +14,13 @@ import { getTimeRemaining } from "@/src/utils/challenges";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 export default function Dashboard() {
   const user = useSelector((state) => state.user.user);
 
@@ -338,7 +345,7 @@ export default function Dashboard() {
                 Badges Earned
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-0">
               {loading ? (
                 <div className="grid grid-cols-2 gap-3">
                   {[...Array(2)].map((_, i) => (
@@ -349,21 +356,24 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : rewards?.badges?.length > 0 ? (
-                <div className="flex flex-wrap gap-6">
-                  {rewards.badges.map((badge) => (
-                    <div
-                      key={badge.id}
-                      className="flex flex-col items-center justify-center text-center"
-                    >
-                      <img
-                        src={badge.icon}
-                        alt={badge.title}
-                        className="w-16 h-16 object-contain"
-                      />
-                      <p className="text-sm font-medium mt-2">{badge.label}</p>
-                    </div>
-                  ))}
-                </div>
+                <TooltipProvider>
+                  <div className="flex flex-wrap gap-6">
+                    {rewards.badges.map((badge) => (
+                      <Tooltip key={badge.id}>
+                        <TooltipTrigger asChild>
+                          <img
+                            src={badge.icon}
+                            alt={badge.title}
+                            className="w-16 h-16 object-contain cursor-pointer"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-sm font-medium">{badge.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </TooltipProvider>
               ) : (
                 <p className="text-sm text-muted-foreground">No badges yet</p>
               )}

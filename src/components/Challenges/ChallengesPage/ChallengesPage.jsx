@@ -47,10 +47,9 @@ export default function ChallengesPage() {
 
   const grouped = getGroupedChallenges(tab);
 
-  const renderChallengeSection = (title, list, type) =>
+  const renderChallengeSection = ( list, type) =>
     list.length > 0 && (
       <>
-        <h2 className="text-xl font-semibold mt-6 mb-3">{title}</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {list.map((c) => (
             <ChallengeCard key={c.challenge_id} type={type} {...c} />
@@ -73,8 +72,8 @@ export default function ChallengesPage() {
         <p className="text-gray-500">No {tab} challenges.</p>
       ) : (
         <>
-          {renderChallengeSection("✅ Enrolled Challenges", grouped.enrolled, tab)}
-          {renderChallengeSection("📌 Other Challenges", grouped.others, tab)}
+          {renderChallengeSection( grouped.enrolled, tab)}
+          {renderChallengeSection( grouped.others, tab)}
         </>
       )}
     </div>
