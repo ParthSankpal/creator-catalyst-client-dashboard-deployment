@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getModuleById, submitModule } from "@/src/api/modules";
 import Notification from "@/src/components/Notification/Notification";
 import { ChevronLeft } from "lucide-react";
+import { formatIndianDate } from "@/src/utils/validation";
 
 // ✅ Extract YouTube Video ID
 function getYouTubeId(url) {
@@ -35,19 +36,19 @@ export default function ModuleDetailPage() {
   const [notification, setNotification] = useState(null);
 
   const fetchModule = async () => {
-  try {
-    const res = await getModuleById(id);
-    setModuleData(res.data);
-  } catch (error) {
-    console.error("Error fetching module:", error);
-    const backendMessage =
-      error?.response?.data?.message || error?.message || "Failed to fetch module";
+    try {
+      const res = await getModuleById(id);
+      setModuleData(res.data);
+    } catch (error) {
+      console.error("Error fetching module:", error);
+      const backendMessage =
+        error?.response?.data?.message || error?.message || "Failed to fetch module";
 
-    setNotification({ message: backendMessage, type: "error" });
-  } finally {
-    setLoading(false);
-  }
-};
+      setNotification({ message: backendMessage, type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchModule();
@@ -175,35 +176,80 @@ export default function ModuleDetailPage() {
             </CardContent>
           </Card>
 
+
           {moduleData.submissions?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Submissions</CardTitle>
+                <CardTitle className="text-lg font-semibold">Recent Submissions</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-4">
+              <CardContent className="space-y-4">
                 {moduleData.submissions.map((sub, idx) => {
-                  const videoId = getYouTubeId(sub.submission);
+                  let thumbnail = null;
+                  try {
+                    const parsedThumb = JSON.parse(sub.thumbnail || "{}");
+                    thumbnail = parsedThumb?.medium || parsedThumb?.default || null;
+                  } catch (e) {
+                    thumbnail = null;
+                  }
+
                   return (
-                    <div key={idx} className="space-y-2">
-                      {videoId ? (
-                        <iframe
-                          width="100%"
-                          height="200"
-                          src={`https://www.youtube.com/embed/${videoId}`}
-                          title="Submission Video"
-                          className="rounded-lg"
-                          allowFullScreen
-                        ></iframe>
-                      ) : (
+                    <div
+                      key={idx}
+                      className="flex flex-col items-start gap-4 border-b pb-4 last:border-0"
+                    >
+                      {/* Thumbnail */}
+                      {thumbnail && (
                         <a
                           href={sub.submission}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block text-blue-600 text-sm underline"
+                          className=""
                         >
-                          {sub.submission}
+                          <img
+                            src={thumbnail}
+                            alt={sub.title || "Submission thumbnail"}
+                            className=" object-cover rounded-md"
+                          />
                         </a>
                       )}
+
+                      {/* Details */}
+                      <div className="flex-1">
+                        {/* Title */}
+                        <a
+                          href={sub.submission}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-sm line-clamp-2 hover:underline"
+                        >
+                          {sub.title || "Untitled Submission"}
+                        </a>
+
+                        {/* Channel + Date */}
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {sub.channel_title || "Unknown Channel"} •{" "}
+                          {sub.published_at
+                            ? formatIndianDate(sub.published_at)
+                          : "No date"}
+                        </p>
+
+                        {/* Status */}
+                        <p
+                          className={`text-xs font-semibold mt-1 ${sub.status === "accepted"
+                            ? "text-green-600"
+                            : sub.status === "rejected"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                            }`}
+                        >
+                          {sub.status === "accepted"
+                            ? "✅ Accepted"
+                            : sub.status === "rejected"
+                              ? `❌ Rejected ${sub.rejected_reason ? `(${sub.rejected_reason})` : ""
+                              }`
+                              : "⏳ Pending Review"}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}
@@ -211,7 +257,10 @@ export default function ModuleDetailPage() {
             </Card>
           )}
         </div>
+
+
       </div>
+
 
       {notification && (
         <Notification

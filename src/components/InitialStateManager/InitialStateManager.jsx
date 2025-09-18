@@ -22,8 +22,6 @@ const InitialStateManager = () => {
       "/",
       "/privacy-policy",
       "/terms-conditions",
-      "/recover-password",
-      "/recover-password/[token]",
       "/signup",
       "/login",
     ];

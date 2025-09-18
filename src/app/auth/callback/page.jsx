@@ -32,6 +32,7 @@ export default function AuthCallback() {
                 id: userData.id,
                 name: userData.user_name || userData.channel_name,
                 email: userData.user_email,
+                avatar: userData.profile_avatar
               }),
               { expires: 7 }
             );

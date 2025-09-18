@@ -14,8 +14,12 @@ import {
 import { logout } from "@/src/api/authApi";
 import { generateFirebaseMessageToken } from "@/src/utils/firebaseMessaging";
 import NotificationsDropdown from "../NotificationsDropdown/NotificationsDropdown";
+import { useSelector } from "react-redux";
 
 export default function Navbar() {
+  const user = useSelector((state) => state.user.user);
+  console.log(user, "user>>>>>>>>>>>>>>>>>>>>>");
+  
   const pathname = usePathname();
   const router = useRouter();
 
@@ -57,8 +61,8 @@ export default function Navbar() {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 cursor-pointer">
                 <img
-                  src="https://github.com/shadcn.png"
-                  alt="user"
+                  src={ user ? user?.avatar : "https://github.com/shadcn.png"}
+                  alt="https://github.com/shadcn.png"
                   className="h-8 w-8 rounded-full border"
                 />
                 <ChevronDown className="h-4 w-4 text-gray-500" />

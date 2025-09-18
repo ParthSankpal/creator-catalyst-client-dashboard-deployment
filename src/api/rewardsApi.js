@@ -7,3 +7,11 @@ export const getRewardPageDetails  = async () => {
 
   return res.data.data;
 };
+
+
+
+export const redeemReward = async (id) => {
+  
+  const res = await axiosClient.post(`/api/redeemRewardsById/${id}`);
+  return res.data;
+};

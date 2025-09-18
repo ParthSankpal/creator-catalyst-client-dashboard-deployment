@@ -8,6 +8,7 @@ import { getUser } from "@/src/api/authApi";
 import Notification from "@/src/components/Notification/Notification";
 import { CreatorSubscribe, CreatorUnsubscribe } from "@/src/api/notificationApi";
 import { getCookie } from "@/src/utils/cookieHandler";
+import { formatIndianDate } from "@/src/utils/validation";
 
 export default function SettingsPage() {
   const [user, setUser] = useState(null);
@@ -172,7 +173,7 @@ export default function SettingsPage() {
                   <div>
                     <p className="text-sm text-gray-500">Account Created</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {new Date(user.created_at).toLocaleString()}
+                      {formatIndianDate(user.created_at)}
                     </p>
                   </div>
                 </div>

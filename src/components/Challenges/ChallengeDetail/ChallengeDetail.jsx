@@ -14,6 +14,7 @@ import {
 } from "@/src/api/challenges";
 import Notification from "@/src/components/Notification/Notification";
 import { ChevronLeft } from "lucide-react";
+import { formatIndianDate } from "@/src/utils/validation";
 
 // ✅ Extract YouTube Video ID
 function getYouTubeId(url) {
@@ -153,8 +154,8 @@ export default function ChallengeDetail() {
               <CardTitle className="text-lg font-semibold">Details</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-              <p><strong>Start Date:</strong> {challenge.start_date}</p>
-              <p><strong>End Date:</strong> {challenge.end_date}</p>
+              <p><strong>Start Date:</strong> {formatIndianDate(challenge.start_date)}</p>
+              <p><strong>End Date:</strong> {formatIndianDate(challenge.end_date)}</p>
               <p><strong>Reward:</strong> {challenge.reward_points} pts / {challenge.reward_coins} coins</p>
               <p><strong>Difficulty:</strong> {challenge.difficulty_level}</p>
               {challenge.location && <p><strong>Location:</strong> {challenge.location}</p>}
@@ -242,7 +243,7 @@ export default function ChallengeDetail() {
                       <Badge variant="outline">{sub.points_awarded} pts</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Submitted at: {new Date(sub.submitted_at).toLocaleString()}
+                      Submitted at: {formatIndianDate(sub.submitted_at)}
                     </p>
                   </div>
                 );

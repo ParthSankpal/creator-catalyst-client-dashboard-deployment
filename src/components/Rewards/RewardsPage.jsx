@@ -5,29 +5,60 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Notification from "@/src/components/Notification/Notification";
-import { getRewardPageDetails } from "@/src/api/rewardsApi";
+import { getRewardPageDetails, redeemReward } from "@/src/api/rewardsApi";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { formatIndianDate } from "@/src/utils/validation";
 
 export default function RewardsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
+  const [redeeming, setRedeeming] = useState(null);
+  const [confirmReward, setConfirmReward] = useState(null); // 🔑 state for modal
+
+  const router = useRouter();
+
+  const fetchData = async () => {
+    try {
+      const res = await getRewardPageDetails();
+      setData(res);
+    } catch (err) {
+      console.error("Error fetching rewards:", err);
+      setNotification({ message: "Failed to load rewards", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getRewardPageDetails();
-        console.log(res);
-        
-        setData(res);
-      } catch (err) {
-        console.error("Error fetching rewards:", err);
-        setNotification({ message: "Failed to load rewards", type: "error" });
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const handleRedeem = async () => {
+    if (!confirmReward) return;
+    try {
+      setRedeeming(confirmReward.reward_id);
+      await redeemReward(confirmReward.reward_id);
+      setNotification({ message: "Reward redeemed successfully!", type: "success" });
+
+      setConfirmReward(null); // close modal
+      await fetchData(); // ✅ refetch
+    } catch (err) {
+      console.error("Redeem Error:", err);
+      setNotification({ message: "Failed to redeem reward", type: "error" });
+    } finally {
+      setRedeeming(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -41,8 +72,14 @@ export default function RewardsPage() {
 
   if (!data) return null;
 
-  const { earned_badges, available_badges, points, rewards, recent_activities } =
-    data;
+  const {
+    earned_badges,
+    available_badges,
+    points,
+    rewards,
+    redeemed_rewards,
+    recent_activities,
+  } = data;
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
@@ -69,50 +106,26 @@ export default function RewardsPage() {
         </CardContent>
       </Card>
 
-      {/* Earned Badges */}
+
+      {/* Weekly Activities Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Earned Badges</CardTitle>
+          <CardTitle>This Week's Summary</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {earned_badges.length > 0 ? (
-            earned_badges.map((b) => (
-              <div
-                key={b.id}
-                className="flex flex-col items-center justify-center p-3 border rounded-lg"
-              >
-                <img src={b.icon} alt={b.label} className="h-10 w-10" />
-                <p className="mt-2 font-medium">{b.label}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-500">No badges earned yet.</p>
-          )}
+        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Points Earned</p>
+            <p className="font-semibold">{points.points_earned_this_week}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Coins Earned</p>
+            <p className="font-semibold">{points.coins_earned_this_week}</p>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Available Badges */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Badges</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {available_badges.map((b) => (
-            <div
-              key={b.id}
-              className="flex flex-col items-center justify-center p-3 border rounded-lg"
-            >
-              <img src={b.icon} alt={b.label} className="h-10 w-10" />
-              <p className="mt-2 font-medium">{b.label}</p>
-              <p className="text-xs text-gray-500 text-center">
-                {b.reward_condition_required}
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
 
-      {/* Rewards Catalog */}
+      {/* Redeemable Rewards */}
       <Card>
         <CardHeader>
           <CardTitle>Redeem Rewards</CardTitle>
@@ -121,18 +134,71 @@ export default function RewardsPage() {
           {rewards.map((r) => (
             <div
               key={r.reward_id}
-              className="flex items-center gap-4 p-4 border rounded-lg"
+              className="md:flex items-center gap-4 p-4 border rounded-lg"
             >
               <div className="text-3xl">{r.reward_logo}</div>
               <div className="flex-1">
                 <p className="font-semibold">{r.reward_name}</p>
-                <p className="text-sm text-gray-500">
-                  {r.reward_description}
-                </p>
+                <p className="text-sm text-gray-500">{r.reward_description}</p>
               </div>
-              <Badge>{r.cost} Coins</Badge>
+              <div className="flex flex-col items-end gap-2">
+                <Badge>{r.cost} Coins</Badge>
+                <Button
+                  size="sm"
+                  className=" cursor-pointer"
+                  variant="outline"
+                  onClick={() => setConfirmReward(r)}   // ✅ Pass reward object
+                  disabled={points.available_coins < r.cost}
+                >
+                  Redeem
+                </Button>
+
+              </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Redeemed Rewards */}
+      {redeemed_rewards.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Redeemed Rewards</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {redeemed_rewards.map((rr) => (
+              <div
+                key={rr.redemption_id}
+                className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50"
+              >
+                <div className="text-3xl">{rr.reward_logo || "🏅"}</div>
+                <div className="flex-1">
+                  <p className="font-semibold">{rr.reward_name || "Reward"}</p>
+                  <p className="text-sm text-gray-500">
+                    Status: {rr.status || "pending"}
+                  </p>
+                </div>
+                <Badge>{rr.coins_used} Coins Used</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Weekly Activities Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>This Week's Summary</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Points Earned</p>
+            <p className="font-semibold">{points.points_earned_this_week}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Coins Earned</p>
+            <p className="font-semibold">{points.coins_earned_this_week}</p>
+          </div>
         </CardContent>
       </Card>
 
@@ -143,32 +209,93 @@ export default function RewardsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {recent_activities.length > 0 ? (
-            recent_activities.map((a, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between items-center border-b pb-2"
-              >
-                <div>
-                  <p className="font-medium">{a.description}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(a.date).toLocaleString()}
-                  </p>
+            recent_activities.map((a, idx) => {
+              let targetUrl = null;
+              if (a.module_id) targetUrl = `/modules/${a.module_id}`;
+              if (a.challenge_id) targetUrl = `/challenges/${a.challenge_id}`;
+
+              // ✅ Check if activity is within last 7 days
+              const activityDate = new Date(a.date);
+              const sevenDaysAgo = new Date();
+              sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+              const isThisWeek = activityDate >= sevenDaysAgo;
+
+              return (
+                <div
+                  key={idx}
+                  className="flex justify-between items-center border-b last:border-b-0 pb-2"
+                >
+                  <div>
+                    <p className="font-medium">{a.description}</p>
+                    <p className="text-xs text-gray-500">
+                      {formatIndianDate(a.date)}
+                    </p>
+                    {isThisWeek && (
+                      <Badge className="mt-1 bg-green-100 text-green-700">
+                        This Week
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-right space-y-1">
+                    {a.points_earned > 0 && (
+                      <p className="text-green-600 text-sm">
+                        +{a.points_earned} pts
+                      </p>
+                    )}
+                    {a.coins_earned > 0 && (
+                      <p className="text-blue-600 text-sm">
+                        {a.coins_earned > 0
+                          ? `+${a.coins_earned} coins`
+                          : `${a.coins_earned} coins`}
+                      </p>
+                    )}
+                    {targetUrl && (
+                      <Button
+                        size="sm"
+                        className="cursor-pointer"
+                        variant="outline"
+                        onClick={() => router.push(targetUrl)}
+                      >
+                        View
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-green-600 text-sm">
-                    +{a.points_earned} pts
-                  </p>
-                  <p className="text-blue-600 text-sm">
-                    +{a.coins_earned} coins
-                  </p>
-                </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <p className="text-sm text-gray-500">No recent activities yet.</p>
           )}
         </CardContent>
       </Card>
+
+
+      {/* Confirm Redeem Modal */}
+      <Dialog open={!!confirmReward} onOpenChange={() => setConfirmReward(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Redemption</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to redeem{" "}
+              <span className="font-semibold">{confirmReward?.reward_name}</span>{" "}
+              for {confirmReward?.cost} coins?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setConfirmReward(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRedeem}
+              className=" cursor-pointer"
+              disabled={redeeming === confirmReward?.reward_id}
+            >
+              {redeeming === confirmReward?.reward_id ? "Redeeming..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {notification && (
         <Notification

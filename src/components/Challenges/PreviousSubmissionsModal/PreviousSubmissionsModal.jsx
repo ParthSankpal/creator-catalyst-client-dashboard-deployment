@@ -24,6 +24,7 @@ import {
   formatDuration,
   getTimeRemaining,
 } from "@/src/utils/challenges"
+import { formatIndianDate } from "@/src/utils/validation"
 
 export default function PreviousSubmissionsModal({
   open,
@@ -126,7 +127,7 @@ export default function PreviousSubmissionsModal({
                   </TableCell>
                   <TableCell>{s.points_awarded}</TableCell>
                   <TableCell>
-                    {new Date(s.submitted_at).toLocaleString()}
+                    {formatIndianDate(s.submitted_at)}
                   </TableCell>
                 </TableRow>
               ))}
