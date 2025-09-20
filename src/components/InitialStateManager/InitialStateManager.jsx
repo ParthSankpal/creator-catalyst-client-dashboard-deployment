@@ -23,6 +23,7 @@ const InitialStateManager = () => {
       "/privacy-policy",
       "/terms-conditions",
       "/signup",
+      "/onboarding"
     ];
 
     const init = async () => {
