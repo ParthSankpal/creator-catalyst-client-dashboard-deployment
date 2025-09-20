@@ -14,15 +14,10 @@ export const generateFirebaseMessageToken = async () => {
       });
 
       if (token) {
-
-        console.log(token, "FIREBASETOKEN");
-        
-
         setCookie("fcm_token", token, { expires: 7 });
         const dedviceToken = new URLSearchParams();
         dedviceToken.append("token", token);
 
-        // ✅ Register device token with backend
         await CreatorSubscribe(dedviceToken);
       }
 

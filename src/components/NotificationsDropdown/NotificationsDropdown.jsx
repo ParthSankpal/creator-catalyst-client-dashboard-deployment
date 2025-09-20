@@ -1,7 +1,6 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +8,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Bell } from "lucide-react";
+import { Bell, CheckCircle, Circle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { onMessage } from "firebase/messaging";
 import { messaging } from "@/src/utils/firebase.config";
-import { addNotification, clearNotifications, markAllRead } from "@/src/store/slices/notificationsSlice";
+import {
+  addNotification,
+  clearNotifications,
+  markAllRead,
+  toggleReadStatus,
+} from "@/src/store/slices/notificationsSlice";
 
 export default function NotificationsDropdown() {
   const dispatch = useDispatch();
@@ -38,7 +42,6 @@ export default function NotificationsDropdown() {
   return (
     <DropdownMenu
       onOpenChange={(open) => {
-        if (open) dispatch(markAllRead()); // reset unread count when opened
         if (!open) setShowAll(false);
       }}
     >
@@ -68,14 +71,26 @@ export default function NotificationsDropdown() {
             {(showAll ? list : list.slice(0, 3)).map((notif) => (
               <DropdownMenuItem
                 key={notif.id}
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors flex items-center justify-between cursor-pointer"
+                onClick={() => dispatch(toggleReadStatus(notif.id))}
               >
                 <div className="flex flex-col">
-                  <span className="font-medium">{notif.title}</span>
+                  <span
+                    className={`font-medium ${
+                      notif.read ? "text-gray-400" : "text-foreground"
+                    }`}
+                  >
+                    {notif.title}
+                  </span>
                   {notif.body && (
                     <span className="text-xs text-gray-500">{notif.body}</span>
                   )}
                 </div>
+                {notif.read ? (
+                  <CheckCircle className="h-4 w-4 text-gray-400" />
+                ) : (
+                  <Circle className="h-4 w-4 text-blue-500" />
+                )}
               </DropdownMenuItem>
             ))}
           </div>
@@ -86,7 +101,7 @@ export default function NotificationsDropdown() {
             <DropdownMenuSeparator />
             <div
               onClick={() => setShowAll(true)}
-              onMouseDown={(e) => e.preventDefault()} // prevent closing
+              onMouseDown={(e) => e.preventDefault()}
               className="px-2 py-1.5 text-center text-sm text-muted-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-md"
             >
               View all notifications
@@ -97,6 +112,13 @@ export default function NotificationsDropdown() {
         {list.length > 0 && (
           <>
             <DropdownMenuSeparator />
+            <div
+              onClick={() => dispatch(markAllRead())}
+              onMouseDown={(e) => e.preventDefault()}
+              className="px-2 py-1.5 text-center text-sm text-blue-500 cursor-pointer hover:bg-blue-100 hover:text-blue-700 rounded-md"
+            >
+              Mark all as read
+            </div>
             <div
               onClick={() => dispatch(clearNotifications())}
               onMouseDown={(e) => e.preventDefault()}

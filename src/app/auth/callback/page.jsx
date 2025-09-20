@@ -57,7 +57,7 @@ export default function AuthCallback() {
           setLoading(false);
         }
       } else {
-        router.push("/login");
+        router.push("/");
       }
     };
 

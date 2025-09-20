@@ -23,7 +23,6 @@ const InitialStateManager = () => {
       "/privacy-policy",
       "/terms-conditions",
       "/signup",
-      "/login",
     ];
 
     const init = async () => {
@@ -56,11 +55,11 @@ const InitialStateManager = () => {
         if (data?.user) {
           dispatch(setUser({ user: data.user, user_id:data.id  ,token: data.token }));
         } else if (!publicPages.includes(pathname)) {
-          router.push("/login");
+          router.push("/");
         }
       } catch {
         if (!publicPages.includes(pathname)) {
-          router.push("/login");
+          router.push("/");
         }
       } finally {
         setChecked(true);
