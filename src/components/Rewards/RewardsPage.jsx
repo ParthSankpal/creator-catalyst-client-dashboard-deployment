@@ -16,6 +16,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { formatIndianDate } from "@/src/utils/validation";
 
 export default function RewardsPage() {
@@ -72,6 +78,8 @@ export default function RewardsPage() {
 
   if (!data) return null;
 
+  console.log(data);
+  
   const {
     earned_badges,
     available_badges,
@@ -106,7 +114,48 @@ export default function RewardsPage() {
         </CardContent>
       </Card>
 
+      {/* Earned Badges */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Earned Badges</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {earned_badges.length > 0 ? (
+            earned_badges.map((b) => (
+              <div
+                key={b.id}
+                className="flex flex-col items-center justify-center p-3 border rounded-lg"
+              >
+                <img src={b.icon} alt={b.label} className="h-10 w-10" />
+                <p className="mt-2 font-medium">{b.label}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No badges earned yet.</p>
+          )}
+        </CardContent>
+      </Card>
 
+      {/* Available Badges */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Badges</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {available_badges.map((b) => (
+            <div
+              key={b.id}
+              className="flex flex-col items-center justify-center p-3 border rounded-lg"
+            >
+              <img src={b.icon} alt={b.label} className="h-10 w-10" />
+              <p className="mt-2 font-medium">{b.label}</p>
+              <p className="text-xs text-gray-500 text-center">
+                {b.reward_condition_required}
+              </p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
       {/* Weekly Activities Summary */}
       <Card>
         <CardHeader>
@@ -136,22 +185,39 @@ export default function RewardsPage() {
               key={r.reward_id}
               className="md:flex items-center gap-4 p-4 border rounded-lg"
             >
-              <div className="text-3xl">{r.reward_logo}</div>
+              <div className="text-3xl">{r.logo}</div>
               <div className="flex-1">
-                <p className="font-semibold">{r.reward_name}</p>
-                <p className="text-sm text-gray-500">{r.reward_description}</p>
+                <p className="font-semibold">{r.title}</p>
+                <p className="text-sm text-gray-500">{r.description}</p>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <Badge>{r.cost} Coins</Badge>
-                <Button
-                  size="sm"
-                  className=" cursor-pointer"
-                  variant="outline"
-                  onClick={() => setConfirmReward(r)}   // ✅ Pass reward object
-                  disabled={points.available_coins < r.cost}
-                >
-                  Redeem
-                </Button>
+                <Badge>{r.coin_cost} Coins</Badge>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Button
+                          size="sm"
+                          className="cursor-pointer"
+                          variant="outline"
+                          onClick={() => setConfirmReward(r)}
+                          disabled={points.available_coins < r.coin_cost}
+                        >
+                          Redeem
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    {points.available_coins < r.coin_cost && (
+                      <TooltipContent>
+                        <p>
+                          You don’t have enough coins. You need{" "}
+                          {r.coin_cost - points.available_coins} more.
+                        </p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+
 
               </div>
             </div>
@@ -185,7 +251,7 @@ export default function RewardsPage() {
         </Card>
       )}
 
-     
+
       {/* Recent Activities */}
       <Card>
         <CardHeader>

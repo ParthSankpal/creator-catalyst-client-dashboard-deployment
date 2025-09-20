@@ -14,6 +14,10 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const jwt = params.get("jwt");
+    const showOnboarding = params.get("show_onboarding");
+
+    console.log(jwt, showOnboarding, "/onboarding");
+
 
     const handleLogin = async () => {
       if (jwt) {
@@ -37,8 +41,12 @@ export default function AuthCallback() {
               { expires: 7 }
             );
           }
+          const redirectTo =
+            showOnboarding == 1 ? "/onboarding" : "/dashboard";
+          console.log(redirectTo);
 
-          router.push("/dashboard");
+          router.push(redirectTo);
+
         } catch (err) {
           if (err.response?.status === 401) {
             console.error("Unauthorized: JWT invalid or expired");

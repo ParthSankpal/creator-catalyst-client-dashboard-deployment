@@ -45,7 +45,7 @@ export default function ChallengeCard(props) {
     setStarting(true);
     try {
       await startChallenge(challenge_id);
-      router.push(`/challenges/${challenge_id}`); // redirect after start
+      router.push(`/challenges/${challenge_id}`);
     } catch (err) {
       console.error("Failed to start challenge:", err);
       alert("Failed to start challenge ❌");

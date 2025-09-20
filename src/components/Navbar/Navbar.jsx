@@ -18,12 +18,10 @@ import { useSelector } from "react-redux";
 
 export default function Navbar() {
   const user = useSelector((state) => state.user.user);
-  console.log(user, "user>>>>>>>>>>>>>>>>>>>>>");
   
   const pathname = usePathname();
   const router = useRouter();
 
-  // ✅ Run FCM setup once when navbar mounts
   useEffect(() => {
     generateFirebaseMessageToken();
   }, []);
@@ -44,19 +42,16 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center gap-2 border-b px-4 bg-background">
-      {/* Sidebar toggle button */}
+    
       <SidebarTrigger />
 
       <div className="flex flex-1 items-center justify-between">
-        {/* Page Title */}
+        
         <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
 
-        {/* Right section */}
         <div className="flex items-center gap-4">
-          {/* 🔔 Notifications */}
           <NotificationsDropdown />
 
-          {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 cursor-pointer">

@@ -14,7 +14,7 @@ const InitialStateManager = () => {
   const pathname = usePathname();
   const dispatch = useDispatch();
 
-  const user = useSelector((state) => state.user.user); // read from Redux
+  const user = useSelector((state) => state.user.user); 
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {

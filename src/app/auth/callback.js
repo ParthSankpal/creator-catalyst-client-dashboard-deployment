@@ -26,9 +26,8 @@ export default function AuthCallback() {
         { expires: 7 }
       );
 
-      // Redirect after small delay so cookies are set
       const redirectTo =
-        showOnboarding === "1" ? "/onboarding" : "/dashboard";
+        showOnboarding === 1 ? "/onboarding" : "/dashboard";
 
       router.push(redirectTo);
     }
