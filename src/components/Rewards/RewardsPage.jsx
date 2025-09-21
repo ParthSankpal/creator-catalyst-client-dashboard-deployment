@@ -29,7 +29,7 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
   const [redeeming, setRedeeming] = useState(null);
-  const [confirmReward, setConfirmReward] = useState(null); // 🔑 state for modal
+  const [confirmReward, setConfirmReward] = useState(null);
 
   const router = useRouter();
 
@@ -50,11 +50,15 @@ export default function RewardsPage() {
   }, []);
 
   const handleRedeem = async () => {
-    if (!confirmReward) return;
+    if (!confirmReward || !confirmReward.id) return;
     try {
-      setRedeeming(confirmReward.reward_id);
-      await redeemReward(confirmReward.reward_id);
-      setNotification({ message: "Reward redeemed successfully!", type: "success" });
+      setRedeeming(confirmReward.id);
+
+      await redeemReward(confirmReward.id);
+      setNotification({
+        message: "Reward redeemed successfully!",
+        type: "success",
+      });
 
       setConfirmReward(null); // close modal
       await fetchData(); // ✅ refetch
@@ -77,8 +81,6 @@ export default function RewardsPage() {
   }
 
   if (!data) return null;
-
-  console.log(data);
 
   const {
     earned_badges,
@@ -156,6 +158,7 @@ export default function RewardsPage() {
           ))}
         </CardContent>
       </Card>
+
       {/* Weekly Activities Summary */}
       <Card>
         <CardHeader>
@@ -173,7 +176,6 @@ export default function RewardsPage() {
         </CardContent>
       </Card>
 
-
       {/* Redeemable Rewards */}
       <Card>
         <CardHeader>
@@ -181,18 +183,16 @@ export default function RewardsPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {rewards
-            .filter((r) => r.total_available > 0) // ✅ only show if available > 0
+            .filter((r) => r.total_available > 0)
             .map((r) => (
               <div
-                key={r.reward_id}
+                key={r.id}
                 className="md:flex items-center gap-4 p-4 border rounded-lg"
               >
                 <div className="text-3xl">{r.logo}</div>
                 <div className="flex-1">
                   <p className="font-semibold">{r.title}</p>
                   <p className="text-sm text-gray-500">{r.description}</p>
-
-                  {/* 👇 Available Coupons */}
                   <p className="text-xs text-gray-500 mt-1">
                     {r.total_available} coupons left
                   </p>
@@ -207,7 +207,7 @@ export default function RewardsPage() {
                             size="sm"
                             className="cursor-pointer"
                             variant="outline"
-                            onClick={() => setConfirmReward(r)}
+                            onClick={() => setConfirmReward(r)} // ✅ full object with id
                             disabled={points.available_coins < r.coin_cost}
                           >
                             Redeem
@@ -229,8 +229,6 @@ export default function RewardsPage() {
             ))}
         </CardContent>
       </Card>
-
-
 
       {/* Redeemed Rewards */}
       {redeemed_rewards.length > 0 && (
@@ -258,7 +256,6 @@ export default function RewardsPage() {
         </Card>
       )}
 
-
       {/* Recent Activities */}
       <Card>
         <CardHeader>
@@ -271,15 +268,20 @@ export default function RewardsPage() {
               if (a.module_id) targetUrl = `/modules/${a.module_id}`;
               if (a.challenge_id) targetUrl = `/challenges/${a.challenge_id}`;
 
-              // ✅ Check if activity is within last 7 days
               const activityDate = new Date(a.date);
               const sevenDaysAgo = new Date();
               sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
               const isThisWeek = activityDate >= sevenDaysAgo;
 
+              // ✅ Generate a stable-ish unique key (use uuid if available)
+              const uniqueKey =
+                a.module_id ||
+                a.challenge_id ||
+                `${a.date}-${idx}-${crypto.randomUUID()}`;
+
               return (
                 <div
-                  key={a.module_id || `${a.date}-${a.description}`}
+                  key={uniqueKey}
                   className="flex justify-between items-center border-b last:border-b-0 pb-2"
                 >
                   <div>
@@ -301,9 +303,7 @@ export default function RewardsPage() {
                     )}
                     {a.coins_earned > 0 && (
                       <p className="text-blue-600 text-sm">
-                        {a.coins_earned > 0
-                          ? `+${a.coins_earned} coins`
-                          : `${a.coins_earned} coins`}
+                        +{a.coins_earned} coins
                       </p>
                     )}
                     {targetUrl && (
@@ -334,8 +334,8 @@ export default function RewardsPage() {
             <DialogTitle>Confirm Redemption</DialogTitle>
             <DialogDescription>
               Are you sure you want to redeem{" "}
-              <span className="font-semibold">{confirmReward?.reward_name}</span>{" "}
-              for {confirmReward?.cost} coins?
+              <span className="font-semibold">{confirmReward?.title}</span>{" "}
+              for {confirmReward?.coin_cost} coins?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2">
@@ -344,15 +344,16 @@ export default function RewardsPage() {
             </Button>
             <Button
               onClick={handleRedeem}
-              className=" cursor-pointer"
-              disabled={redeeming === confirmReward?.reward_id}
+              className="cursor-pointer"
+              disabled={redeeming === confirmReward?.id}
             >
-              {redeeming === confirmReward?.reward_id ? "Redeeming..." : "Confirm"}
+              {redeeming === confirmReward?.id
+                ? "Redeeming..."
+                : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
 
       {notification && (
         <Notification
