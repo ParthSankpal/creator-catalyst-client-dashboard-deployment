@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -37,12 +38,17 @@ const navigation = [
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const { state } = useSidebar();
 
   return (
-    <Sidebar  collapsible="icon" className="border-r">
+    <Sidebar collapsible="icon" className="border-r">
       {/* Header / Logo */}
       <SidebarHeader className="flex items-center justify-center py-4">
-        <span className="font-semibold text-lg">LOGO</span>
+        {state === "expanded" ? (
+          <img src={"/cclogo.png"} alt="Logo" className="h-8 w-auto" />
+        ) : (
+          <img src={"/cclogoshort.png"} alt="Short Logo" className="h-8 w-auto" />
+        )}
       </SidebarHeader>
 
       <SidebarContent className="sidebaricons flex-none items-start">
