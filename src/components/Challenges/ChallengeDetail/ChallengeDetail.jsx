@@ -53,6 +53,26 @@ export default function ChallengeDetail() {
   const [city, setCity] = useState("");
   const [notification, setNotification] = useState(null);
 
+
+  const [expandedMap, setExpandedMap] = useState({});
+  const [metaExpandedMap, setMetaExpandedMap] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedMap((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const toggleMetaExpand = (id) => {
+    setMetaExpandedMap((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+
+
   const fetchChallenge = async () => {
     try {
       const res = await getChallengeById(id);
@@ -207,17 +227,20 @@ export default function ChallengeDetail() {
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Submissions</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {sortedSubmissions.map((sub, idx) => {
+
+            <CardContent className="grid grid-cols-1 md:grid-cols-2  gap-6">
+              {sortedSubmissions.map((sub) => {
                 const videoId = getYouTubeId(sub.submission_url);
+
                 return (
-                  <div key={idx} className="space-y-2 border rounded-lg p-3">
+                  <div key={sub.submission_id} className="space-y-2 border rounded-lg p-3">
+                    {/* Video Embed or Link */}
                     {videoId ? (
                       <iframe
                         width="100%"
                         height="250"
                         src={`https://www.youtube.com/embed/${videoId}`}
-                        title="Submission Video"
+                        title={sub.title || "Submission Video"}
                         className="rounded-lg"
                         allowFullScreen
                       ></iframe>
@@ -231,17 +254,112 @@ export default function ChallengeDetail() {
                         {sub.submission_url}
                       </a>
                     )}
+
+                    {/* Metadata */}
+                    <div className="space-y-1">
+                      <p className="font-semibold">{sub.title || "Untitled Video"}</p>
+
+                      {/* Description with Read More */}
+                      {sub.description && (
+                        <div className="text-xs text-muted-foreground">
+                          <p className={`${!expandedMap[sub.submission_id] ? "line-clamp-2" : ""}`}>
+                            {sub.description}
+                          </p>
+                          {sub.description.length > 120 && (
+                            <button
+                              onClick={() => toggleExpand(sub.submission_id)}
+                              className="text-blue-600 text-xs mt-1 underline cursor-pointer"
+                            >
+                              {expandedMap[sub.submission_id] ? "Show less" : "Read more"}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      <p className="text-xs text-gray-500">
+                        📺 {sub.channel_title || "Unknown Channel"}
+                      </p>
+                      <div className="flex gap-4 text-xs text-gray-600">
+                        <span>👁 {sub.view_count?.toLocaleString() || 0} views</span>
+                        <span>👍 {sub.like_count?.toLocaleString() || 0} likes</span>
+                        <span>💬 {sub.comment_count?.toLocaleString() || 0} comments</span>
+                      </div>
+                    </div>
+
+                    {/* Status */}
                     <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        {getStatusBadge(sub.status)}
+                      <div className="flex flex-col">
+                        <p
+                          className={`text-xs font-semibold mt-1 ${sub.status === "accepted"
+                              ? "text-green-600"
+                              : sub.status === "rejected"
+                                ? "text-red-600"
+                                : "text-yellow-600"
+                            }`}
+                        >
+                          {sub.status === "accepted"
+                            ? "✅ Accepted"
+                            : sub.status === "rejected"
+                              ? `❌ Rejected ${sub.rejected_reason ? `(${sub.rejected_reason})` : ""}`
+                              : "⏳ Pending Review"}
+                        </p>
                         {sub.accept_status ? (
-                          <Badge className="bg-blue-500 text-white">✔ Reviewed</Badge>
+                          <Badge className="bg-blue-500 text-white w-fit mt-1">
+                            ✔ Reviewed
+                          </Badge>
                         ) : (
-                          <Badge className="bg-yellow-500 text-white">⏳ Not Reviewed</Badge>
+                          <Badge className="bg-yellow-500 text-white w-fit mt-1">
+                            ⏳ Not Reviewed
+                          </Badge>
                         )}
                       </div>
-                      <Badge variant="outline">{sub.points_awarded} pts</Badge>
+                      <div className="flex flex-col items-end">
+                        <Badge variant="outline">{sub.points_awarded} pts</Badge>
+                        {sub.coins_awarded > 0 && (
+                          <Badge variant="outline" className="mt-1">
+                            {sub.coins_awarded} coins
+                          </Badge>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Extra Metadata (collapsible) */}
+                    <div className="text-xs text-gray-600 mt-2">
+                      {metaExpandedMap[sub.submission_id] && (
+                        <div className="space-y-1">
+                          {sub.tags && (
+                            <p>
+                              <strong>Tags:</strong> {sub.tags}
+                            </p>
+                          )}
+                          {sub.hashtags && (
+                            <p>
+                              <strong>Hashtags:</strong> {sub.hashtags}
+                            </p>
+                          )}
+                          {sub.location && (
+                            <p>
+                              <strong>Location:</strong> {sub.location}
+                            </p>
+                          )}
+                          {sub.city && (
+                            <p>
+                              <strong>City:</strong> {sub.city}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Toggle Button */}
+                      <button
+                        onClick={() => toggleMetaExpand(sub.submission_id)}
+                        className="text-blue-600 text-xs mt-2 underline cursor-pointer"
+                      >
+                        {metaExpandedMap[sub.submission_id] ? "Hide details" : "Show more details"}
+                      </button>
+                    </div>
+
+                    {/* Submission Date */}
                     <p className="text-xs text-muted-foreground">
                       Submitted at: {formatIndianDate(sub.submitted_at)}
                     </p>

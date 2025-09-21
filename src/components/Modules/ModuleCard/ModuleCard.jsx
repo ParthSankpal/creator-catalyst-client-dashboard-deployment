@@ -40,19 +40,30 @@ export default function ModuleCard({
     setStarting(false);
   };
 
+
+  const formatStatus = (status) => {
+    if (!status) return "";
+    return status
+      .split("_") // break snake_case into words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize
+      .join(" "); // join with space
+  };
+
+
   return (
     <Card className="flex flex-col justify-between hover:shadow-lg transition duration-200">
       <div>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-start justify-between">
           <CardTitle className="text-lg">{title}</CardTitle>
           {tab !== "available" && (
             <Badge
               variant={progress_status === "completed" ? "default" : "secondary"}
               className="capitalize"
             >
-              {progress_status}
+              {formatStatus(progress_status)}
             </Badge>
           )}
+
         </CardHeader>
 
         <CardContent>
@@ -60,7 +71,7 @@ export default function ModuleCard({
             <div className=" mb-3">
               {description || "No description available"}
             </div>
-            
+
           </CardDescription>
 
           {tab !== "available" && (

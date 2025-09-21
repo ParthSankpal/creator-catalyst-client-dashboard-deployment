@@ -1,7 +1,7 @@
 import { getToken } from "firebase/messaging";
 import { CreatorSubscribe } from "../api/notificationApi";
 import { messaging } from "./firebase.config";
-import { setCookie } from "./cookieHandler";
+import { getCookie, setCookie } from "./cookieHandler";
 
 export const generateFirebaseMessageToken = async () => {
   try {
@@ -14,11 +14,17 @@ export const generateFirebaseMessageToken = async () => {
       });
 
       if (token) {
-        setCookie("fcm_token", token, { expires: 7 });
-        const dedviceToken = new URLSearchParams();
-        dedviceToken.append("token", token);
+        const existingToken = getCookie("fcm_token");
 
-        await CreatorSubscribe(dedviceToken);
+        // ✅ Only call API if token is new
+        if (existingToken !== token) {
+          setCookie("fcm_token", token, { expires: 7 });
+
+          const deviceToken = new URLSearchParams();
+          deviceToken.append("token", token);
+
+          await CreatorSubscribe(deviceToken);
+        }
       }
 
       return token;

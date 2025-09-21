@@ -42,7 +42,9 @@ export default function ModuleDetailPage() {
     } catch (error) {
       console.error("Error fetching module:", error);
       const backendMessage =
-        error?.response?.data?.message || error?.message || "Failed to fetch module";
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch module";
 
       setNotification({ message: backendMessage, type: "error" });
     } finally {
@@ -68,10 +70,9 @@ export default function ModuleDetailPage() {
     } catch (err) {
       console.error("Submit Error:", err);
 
-      // 🔹 Safely extract backend error message
       const backendMessage =
-        err?.response?.data?.message || // common pattern if backend returns { message }
-        err?.message ||                 // fallback to error.message
+        err?.response?.data?.message ||
+        err?.message ||
         "Submission failed";
 
       setNotification({ message: backendMessage, type: "error" });
@@ -79,7 +80,6 @@ export default function ModuleDetailPage() {
       setSubmitting(false);
     }
   };
-
 
   if (loading) {
     return (
@@ -116,7 +116,9 @@ export default function ModuleDetailPage() {
         <div className="w-full md:w-2/3 space-y-4">
           {/* Title */}
           <h1 className="text-2xl font-semibold">{moduleData.title}</h1>
-          <h1 className="text-base text-muted-foreground">{moduleData.description}</h1>
+          <h1 className="text-base text-muted-foreground">
+            {moduleData.description}
+          </h1>
 
           {/* Video */}
           <div>
@@ -134,10 +136,12 @@ export default function ModuleDetailPage() {
             )}
           </div>
 
-          {/* Description */}
+          {/* Documentation */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">Documentation</CardTitle>
+              <CardTitle className="text-lg font-semibold">
+                Documentation
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
@@ -147,7 +151,7 @@ export default function ModuleDetailPage() {
           </Card>
         </div>
 
-        {/* Right Section */}
+        {/* Right Section - Activity + Submission */}
         <div className="w-full md:w-1/3 pt-10 space-y-4">
           <Card>
             <CardHeader>
@@ -175,91 +179,112 @@ export default function ModuleDetailPage() {
               </div>
             </CardContent>
           </Card>
-
-
-          {moduleData.submissions?.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Recent Submissions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {moduleData.submissions.map((sub, idx) => {
-                  let thumbnail = null;
-                  try {
-                    const parsedThumb = JSON.parse(sub.thumbnail || "{}");
-                    thumbnail = parsedThumb?.medium || parsedThumb?.default || null;
-                  } catch (e) {
-                    thumbnail = null;
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      className="flex flex-col items-start gap-4 border-b pb-4 last:border-0"
-                    >
-                      {/* Thumbnail */}
-                      {thumbnail && (
-                        <a
-                          href={sub.submission}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className=""
-                        >
-                          <img
-                            src={thumbnail}
-                            alt={sub.title || "Submission thumbnail"}
-                            className=" object-cover rounded-md"
-                          />
-                        </a>
-                      )}
-
-                      {/* Details */}
-                      <div className="flex-1">
-                        {/* Title */}
-                        <a
-                          href={sub.submission}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-sm line-clamp-2 hover:underline"
-                        >
-                          {sub.title || "Untitled Submission"}
-                        </a>
-
-                        {/* Channel + Date */}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {sub.channel_title || "Unknown Channel"} •{" "}
-                          {sub.published_at
-                            ? formatIndianDate(sub.published_at)
-                          : "No date"}
-                        </p>
-
-                        {/* Status */}
-                        <p
-                          className={`text-xs font-semibold mt-1 ${sub.status === "accepted"
-                            ? "text-green-600"
-                            : sub.status === "rejected"
-                              ? "text-red-600"
-                              : "text-yellow-600"
-                            }`}
-                        >
-                          {sub.status === "accepted"
-                            ? "✅ Accepted"
-                            : sub.status === "rejected"
-                              ? `❌ Rejected ${sub.rejected_reason ? `(${sub.rejected_reason})` : ""
-                              }`
-                              : "⏳ Pending Review"}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          )}
         </div>
-
-
       </div>
+
+      {/* ✅ Recent Submissions - moved BELOW */}
+      {/* ✅ Recent Submissions - YouTube style grid with description + points */}
+{moduleData.submissions?.length > 0 && (
+  <div className="p-6">
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">
+          Recent Submissions
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {moduleData.submissions.map((sub, idx) => {
+            let thumbnail = null;
+            try {
+              const parsedThumb = JSON.parse(sub.thumbnail || "{}");
+              thumbnail = parsedThumb?.medium || parsedThumb?.default || null;
+            } catch (e) {
+              thumbnail = null;
+            }
+
+            return (
+              <div
+                key={idx}
+                className="flex flex-col bg-card rounded-lg shadow-sm hover:shadow-md transition p-2"
+              >
+                {/* Thumbnail */}
+                <a
+                  href={sub.submission}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  {thumbnail ? (
+                    <img
+                      src={thumbnail}
+                      alt={sub.title || "Submission thumbnail"}
+                      className="w-full h-40 object-cover rounded-md"
+                    />
+                  ) : (
+                    <div className="w-full h-40 bg-muted flex items-center justify-center rounded-md text-sm text-muted-foreground">
+                      No Thumbnail
+                    </div>
+                  )}
+                </a>
+
+                {/* Info */}
+                <div className="mt-2 space-y-1">
+                  {/* Title */}
+                  <a
+                    href={sub.submission}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-sm line-clamp-2 hover:underline"
+                  >
+                    {sub.title || "Untitled Submission"}
+                  </a>
+
+                  {/* Channel + Date */}
+                  <p className="text-xs text-muted-foreground">
+                    {sub.channel_title || "Unknown Channel"} •{" "}
+                    {sub.published_at
+                      ? formatIndianDate(sub.published_at)
+                      : "No date"}
+                  </p>
+
+                  {/* ✅ Description */}
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {sub.description || "No description available"}
+                  </p>
+
+                  {/* ✅ Points */}
+                  <p className="text-xs text-blue-600 font-medium">
+                    🎯 {sub.points_awarded || 0} pts
+                  </p>
+
+                  {/* Status */}
+                  <p
+                    className={`text-xs font-semibold ${
+                      sub.status === "accepted"
+                        ? "text-green-600"
+                        : sub.status === "rejected"
+                        ? "text-red-600"
+                        : "text-yellow-600"
+                    }`}
+                  >
+                    {sub.status === "accepted"
+                      ? "✅ Accepted"
+                      : sub.status === "rejected"
+                      ? `❌ Rejected ${
+                          sub.rejected_reason ? `(${sub.rejected_reason})` : ""
+                        }`
+                      : "⏳ Pending Review"}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+)}
 
 
       {notification && (

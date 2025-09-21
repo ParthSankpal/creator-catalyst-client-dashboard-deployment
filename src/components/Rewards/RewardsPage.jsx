@@ -79,7 +79,7 @@ export default function RewardsPage() {
   if (!data) return null;
 
   console.log(data);
-  
+
   const {
     earned_badges,
     available_badges,
@@ -180,50 +180,57 @@ export default function RewardsPage() {
           <CardTitle>Redeem Rewards</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {rewards.map((r) => (
-            <div
-              key={r.reward_id}
-              className="md:flex items-center gap-4 p-4 border rounded-lg"
-            >
-              <div className="text-3xl">{r.logo}</div>
-              <div className="flex-1">
-                <p className="font-semibold">{r.title}</p>
-                <p className="text-sm text-gray-500">{r.description}</p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <Badge>{r.coin_cost} Coins</Badge>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span>
-                        <Button
-                          size="sm"
-                          className="cursor-pointer"
-                          variant="outline"
-                          onClick={() => setConfirmReward(r)}
-                          disabled={points.available_coins < r.coin_cost}
-                        >
-                          Redeem
-                        </Button>
-                      </span>
-                    </TooltipTrigger>
-                    {points.available_coins < r.coin_cost && (
-                      <TooltipContent>
-                        <p>
-                          You don’t have enough coins. You need{" "}
-                          {r.coin_cost - points.available_coins} more.
-                        </p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
+          {rewards
+            .filter((r) => r.total_available > 0) // ✅ only show if available > 0
+            .map((r) => (
+              <div
+                key={r.reward_id}
+                className="md:flex items-center gap-4 p-4 border rounded-lg"
+              >
+                <div className="text-3xl">{r.logo}</div>
+                <div className="flex-1">
+                  <p className="font-semibold">{r.title}</p>
+                  <p className="text-sm text-gray-500">{r.description}</p>
 
-
+                  {/* 👇 Available Coupons */}
+                  <p className="text-xs text-gray-500 mt-1">
+                    {r.total_available} coupons left
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <Badge>{r.coin_cost} Coins</Badge>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            size="sm"
+                            className="cursor-pointer"
+                            variant="outline"
+                            onClick={() => setConfirmReward(r)}
+                            disabled={points.available_coins < r.coin_cost}
+                          >
+                            Redeem
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      {points.available_coins < r.coin_cost && (
+                        <TooltipContent>
+                          <p>
+                            You don’t have enough coins. You need{" "}
+                            {r.coin_cost - points.available_coins} more.
+                          </p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </CardContent>
       </Card>
+
+
 
       {/* Redeemed Rewards */}
       {redeemed_rewards.length > 0 && (
@@ -272,7 +279,7 @@ export default function RewardsPage() {
 
               return (
                 <div
-                  key={idx}
+                  key={a.module_id || `${a.date}-${a.description}`}
                   className="flex justify-between items-center border-b last:border-b-0 pb-2"
                 >
                   <div>
