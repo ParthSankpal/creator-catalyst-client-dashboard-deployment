@@ -109,7 +109,7 @@ export default function ModulesPage() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semiboldbold mb-6">📘 Modules</h2>
+      <h2 className="text-2xl font-semiboldbold mb-6">📘 Learning Modules</h2>
 
       <Tabs tabs={tabs} activeTab={tab} onChange={setTab} />
 
@@ -123,7 +123,7 @@ export default function ModulesPage() {
               {...mod}
               tab={tab}
               onStart={handleStart}
-              onView={() => router.push(`/modules/${mod.module_id}`)}
+              onView={() => router.push(`/learning-modules/${mod.module_id}`)}
             />
           ))}
         </div>

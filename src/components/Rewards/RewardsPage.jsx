@@ -22,6 +22,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Trophy,
+  Award,
+  Gift,
+} from "lucide-react";
 import { formatIndianDate } from "@/src/utils/validation";
 
 export default function RewardsPage() {
@@ -95,26 +100,51 @@ export default function RewardsPage() {
     <div className="max-w-5xl mx-auto p-6 space-y-8">
       <h2 className="text-2xl font-bold">🎁 Rewards & Badges</h2>
 
-      {/* Points Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Points</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Total Points</p>
-            <p className="font-semibold">{points.total_points}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Available Coins</p>
-            <p className="font-semibold">{points.available_coins}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Redeemed Coins</p>
-            <p className="font-semibold">{points.redeemed_coins}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Points Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Points</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">Total Points</p>
+              <p className="font-semibold">{points.total_points}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Available Coins</p>
+              <p className="font-semibold">{points.available_coins}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Redeemed Coins</p>
+              <p className="font-semibold">{points.redeemed_coins}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Weekly Activities Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle>This Week's Summary</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">Points Earned</p>
+              <p className="font-semibold">{points.points_earned_this_week}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Coins Earned</p>
+              <p className="font-semibold">{points.coins_earned_this_week}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Coins Redeemed</p>
+              <p className="font-semibold">{points.redeemed_coins}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
 
       {/* Earned Badges */}
       <Card>
@@ -159,22 +189,6 @@ export default function RewardsPage() {
         </CardContent>
       </Card>
 
-      {/* Weekly Activities Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>This Week's Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Points Earned</p>
-            <p className="font-semibold">{points.points_earned_this_week}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Coins Earned</p>
-            <p className="font-semibold">{points.coins_earned_this_week}</p>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Redeemable Rewards */}
       <Card>
@@ -265,7 +279,7 @@ export default function RewardsPage() {
           {recent_activities.length > 0 ? (
             recent_activities.map((a, idx) => {
               let targetUrl = null;
-              if (a.module_id) targetUrl = `/modules/${a.module_id}`;
+              if (a.module_id) targetUrl = `/learning-modules/${a.module_id}`;
               if (a.challenge_id) targetUrl = `/challenges/${a.challenge_id}`;
 
               const activityDate = new Date(a.date);
@@ -273,11 +287,21 @@ export default function RewardsPage() {
               sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
               const isThisWeek = activityDate >= sevenDaysAgo;
 
-              // ✅ Generate a stable-ish unique key (use uuid if available)
+              // ✅ Stable-ish unique key
               const uniqueKey =
                 a.module_id ||
                 a.challenge_id ||
                 `${a.date}-${idx}-${crypto.randomUUID()}`;
+
+              // ✅ Map activity types → label + icon
+              const activityMap = {
+                challenge: { label: "Challenge", icon: Trophy },
+                badge_received: { label: "Badge", icon: Award },
+                reward_redeem: { label: "Reward", icon: Gift },
+              };
+
+              const { label, icon: Icon } =
+                activityMap[a.activity_type] || { label: "Activity", icon: Trophy };
 
               return (
                 <div
@@ -289,11 +313,20 @@ export default function RewardsPage() {
                     <p className="text-xs text-gray-500">
                       {formatIndianDate(a.date)}
                     </p>
-                    {isThisWeek && (
-                      <Badge className="mt-1 bg-green-100 text-green-700">
-                        This Week
+                    <div className="flex gap-2 mt-1">
+                      <Badge
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        <Icon className="w-3 h-3" />
+                        {label}
                       </Badge>
-                    )}
+                      {isThisWeek && (
+                        <Badge className="bg-green-100 text-green-700">
+                          This Week
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="text-right space-y-1">
                     {a.points_earned > 0 && (
@@ -304,6 +337,11 @@ export default function RewardsPage() {
                     {a.coins_earned > 0 && (
                       <p className="text-blue-600 text-sm">
                         +{a.coins_earned} coins
+                      </p>
+                    )}
+                    {a.coins_earned < 0 && (
+                      <p className="text-red-600 text-sm">
+                        {a.coins_earned} coins
                       </p>
                     )}
                     {targetUrl && (

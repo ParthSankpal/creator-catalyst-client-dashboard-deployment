@@ -105,7 +105,7 @@ export default function ModuleDetailPage() {
       {/* Back Button */}
       <div
         className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground"
-        onClick={() => router.push("/modules")}
+        onClick={() => router.push("/learning-modules")}
       >
         <ChevronLeft className="w-4 h-4" />
         <span>Back</span>

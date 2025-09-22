@@ -71,16 +71,7 @@ export default function ChallengeCard(props) {
             {challenge_status}
           </Badge>
           {/* Show submission accept_status if available */}
-          {latestSubmission && (
-            <div className=" flex items-center gap-2 text-sm">
-              {latestSubmission.accept_status ? (
-                <Badge className="bg-green-500 text-white">✔ Reviewed</Badge>
-              ) : (
-                <Badge className="bg-yellow-500 text-white">⏳ Under Review</Badge>
-              )}
-              
-            </div>
-          )}
+          
         </CardHeader>
 
         <CardContent className=" pt-4">

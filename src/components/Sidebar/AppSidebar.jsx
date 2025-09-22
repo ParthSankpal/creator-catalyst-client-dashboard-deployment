@@ -30,7 +30,7 @@ import { usePathname } from "next/navigation";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Challenges", href: "/challenges", icon: Folder },
-  { name: "Modules", href: "/modules", icon: Calendar },
+  { name: "Learning Modules", href: "/learning-modules", icon: Calendar },
   { name: "Leaderboard", href: "/leaderboard", icon: FileText },
   { name: "Rewards", href: "/rewards", icon: Award },
   { name: "Settings", href: "/settings", icon: Settings },

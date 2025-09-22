@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 
 export default function Navbar() {
   const user = useSelector((state) => state.user.user);
-  
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -30,8 +30,17 @@ export default function Navbar() {
     if (!pathname) return "Dashboard";
     const parts = pathname.split("/").filter(Boolean);
     if (parts.length === 0) return "Dashboard";
-    return capitalize(parts[0]);
+
+    // Take the first segment
+    const segment = parts[0];
+
+    // Convert kebab-case to spaced & capitalized words
+    return segment
+      .split("-")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
+
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -42,11 +51,11 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center gap-2 border-b px-4 bg-background">
-    
+
       <SidebarTrigger />
 
       <div className="flex flex-1 items-center justify-between">
-        
+
         <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
 
         <div className="flex items-center gap-4">
@@ -56,7 +65,7 @@ export default function Navbar() {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 cursor-pointer">
                 <img
-                  src={ user ? user?.avatar : "https://github.com/shadcn.png"}
+                  src={user ? user?.avatar : "https://github.com/shadcn.png"}
                   alt="https://github.com/shadcn.png"
                   className="h-8 w-8 rounded-full border"
                 />
