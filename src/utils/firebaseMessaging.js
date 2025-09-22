@@ -19,11 +19,7 @@ export const generateFirebaseMessageToken = async () => {
         // ✅ Only call API if token is new
         if (existingToken !== token) {
           setCookie("fcm_token", token, { expires: 7 });
-
-          const deviceToken = new URLSearchParams();
-          deviceToken.append("token", token);
-
-          await CreatorSubscribe(deviceToken);
+          await CreatorSubscribe(token);
         }
       }
 
