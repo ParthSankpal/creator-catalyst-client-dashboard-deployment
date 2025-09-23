@@ -6,10 +6,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCreatorRewards } from "@/src/api/dashboard";
+import {
+  getCreatorRewards,
+  getCreatorEventUploads,
+  getLeaderboard,
+} from "@/src/api/dashboard";
 import { getCreatorModules } from "@/src/api/modules";
 import { getChallenges } from "@/src/api/challenges";
-import { getLeaderboard } from "@/src/api/dashboard";
 import { getTimeRemaining } from "@/src/utils/challenges";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,24 +31,32 @@ export default function Dashboard() {
   const [creatorModules, setCreatorModules] = useState([]);
   const [challenges, setChallenges] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [eventUploads, setEventUploads] = useState([]);
+  const [ loading, setLoading ] = useState( true );
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const [rewardsRes, modulesRes, challengesRes, leaderboardRes] =
-          await Promise.all([
-            getCreatorRewards(),
-            getCreatorModules(),
-            getChallenges(),
-            getLeaderboard(),
-          ]);
+        const [
+          rewardsRes,
+          modulesRes,
+          challengesRes,
+          leaderboardRes,
+          uploadsRes,
+        ] = await Promise.all([
+          getCreatorRewards(),
+          getCreatorModules(),
+          getChallenges(),
+          getLeaderboard(),
+          getCreatorEventUploads(), // 🔹 fetch uploads
+        ]);
 
         setRewards(rewardsRes?.data);
         setCreatorModules(modulesRes?.data || []);
         setChallenges(challengesRes?.data || []);
         setLeaderboard(leaderboardRes?.data || []);
+        setEventUploads(uploadsRes?.data || []); // 🔹 set uploads
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -74,7 +85,7 @@ export default function Dashboard() {
   )?.rank;
 
   return (
-    <div className=" pt-6 space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="pt-6 space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Greeting */}
       <h2 className="text-3xl font-semibold">
         Welcome Back, {user?.name?.split(" ")[0]}!
@@ -242,10 +253,10 @@ export default function Dashboard() {
                         key={ch.challenge_id}
                         className="grid grid-cols-4 gap-4 items-center px-4 py-3 hover:bg-gray-50 transition"
                         style={{
-                          gridTemplateColumns: "2fr 1fr 1fr 1fr", // 🔹 Title wider than others
+                          gridTemplateColumns: "2fr 1fr 1fr 1fr",
                         }}
                       >
-                        {/* Challenge Title (Desktop Table) */}
+                        {/* Challenge Title */}
                         <div className="font-medium text-gray-800">
                           {ch.challenge_title.length > 27
                             ? ch.challenge_title.slice(0, 27) + "..."
@@ -271,7 +282,7 @@ export default function Dashboard() {
                           <a href={`/challenges/${ch.challenge_id}`}>
                             <Button
                               size="sm"
-                              className="rounded-full px-7 bg-[#1499FF] hover:cursor-pointer hover:bg-[#81C2FB]"
+                              className="rounded-full px-7 bg-[#1499FF] hover:bg-[#81C2FB]"
                             >
                               View
                             </Button>
@@ -305,7 +316,7 @@ export default function Dashboard() {
                       <a href={`/challenges/${ch.challenge_id}`}>
                         <Button
                           size="sm"
-                          className="rounded-full text-[15px] px-10 py-5 bg-[#1499FF] hover:cursor-pointer hover:bg-[#81C2FB]"
+                          className="rounded-full text-[15px] px-10 py-5 bg-[#1499FF] hover:bg-[#81C2FB]"
                         >
                           View
                         </Button>
@@ -323,6 +334,127 @@ export default function Dashboard() {
                   <Link href="/challenges">Explore Challenges</Link>
                 </Button>
               </div>
+            )}
+          </div>
+
+          {/* 🔹 Your Submissions Section */}
+          <div className="mt-10">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-semibold text-[1.25rem]">Your Submissions</h3>
+            </div>
+
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(2)].map((_, i) => (
+                  <Skeleton key={i} className="h-20 w-full rounded-lg" />
+                ))}
+              </div>
+            ) : eventUploads.length > 0 ? (
+              <div className="space-y-3">
+                {eventUploads.map((upload) => (
+                  <Card
+                    key={upload.video_id}
+                    className="px-4 py-4 rounded-xl bg-white"
+                  >
+                    {/* Mobile Layout (<sm) */}
+                    <div className="flex flex-col sm:hidden gap-5">
+                      {/* Thumbnail and Button */}
+                      <div className="flex justify-between items-center">
+                        {/* Thumbnail */}
+                        <div className="h-15 flex-shrink-0">
+                          <img
+                            src={upload.thumbnails?.medium?.url}
+                            alt={upload.title || "Video Thumbnail"}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+
+                        {/* View Button */}
+                        <a
+                          href={upload.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button
+                            size="sm"
+                            className="rounded-full px-4 py-2 bg-white hover:bg-[#81C2FB] text-[#81C2FB] font-medium border-[1px] border-[#81C2FB] hover:text-white"
+                          >
+                            View Video
+                          </Button>
+                        </a>
+                      </div>
+
+                      {/* Title + Hashtags */}
+                      <div>
+                        <p className="text-lg font-semibold text-black mb-2">
+                          {upload.title.length > 15
+                            ? `${upload.title.slice(0, 15)}...`
+                            : upload.title}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {upload.used_hashtags?.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="bg-[#81C2FB] text-sm text-black px-3 py-1 rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop Layout (sm and up) */}
+                    <div className="hidden sm:flex flex-row items-center justify-between gap-6">
+                      {/* Thumbnail */}
+                      <div className="h-17 flex-shrink-0">
+                        <img
+                          src={upload.thumbnails?.medium?.url}
+                          alt={upload.title || "Video Thumbnail"}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+
+                      {/* Title + Hashtags */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-lg font-semibold text-black truncate mb-2">
+                          {upload.title.length > 33
+                            ? `${upload.title.slice(0, 33)}...`
+                            : upload.title}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {upload.used_hashtags?.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="bg-[#81C2FB] text-sm text-black px-3 py-1 rounded-full"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* View Button */}
+                      <div className="flex justify-end">
+                        <a
+                          href={upload.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button
+                            size="sm"
+                            className="rounded-full px-4 py-2 bg-white hover:bg-[#81C2FB] text-[#81C2FB] font-medium border-[1px] border-[#81C2FB] hover:text-white"
+                          >
+                            View Video
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground">No submissions yet</p>
             )}
           </div>
         </div>
