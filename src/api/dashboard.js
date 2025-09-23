@@ -36,3 +36,10 @@ export const getCreatorChallenges = async () => {
   const res = await axiosClient.get(`/api/getCreatorChallenges`);
   return res.data;
 };
+
+// Get all uploaded videos for events created by the creator data
+export const getCreatorEventUploads = async () => {
+  const res = await axiosClient.get(`/api/getCreatorEventUploads`);
+  return res.data;
+};
+
