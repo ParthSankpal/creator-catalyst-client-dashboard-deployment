@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getModuleById, submitModule } from "@/src/api/modules";
+import { completeModule, getModuleById, submitModule } from "@/src/api/modules";
 import Notification from "@/src/components/Notification/Notification";
 import { ChevronLeft } from "lucide-react";
 import { formatIndianDate } from "@/src/utils/validation";
@@ -32,6 +32,8 @@ export default function ModuleDetailPage() {
   const [moduleData, setModuleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [complete, setComplete] = useState(false)
   const [url, setUrl] = useState("");
   const [notification, setNotification] = useState(null);
 
@@ -80,6 +82,26 @@ export default function ModuleDetailPage() {
       setSubmitting(false);
     }
   };
+
+  const handleComplete = async () => {
+    setCompleting(true); // ✅ mark submitting
+    try {
+      await completeModule(id);
+      setNotification({ message: "Module marked as complete!", type: "success" });
+      setComplete(true); // ✅ now mark as completed
+      await fetchModule(); // ✅ refresh data
+    } catch (err) {
+      console.error("Complete Error:", err);
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to mark complete";
+      setNotification({ message: backendMessage, type: "error" });
+    } finally {
+      setCompleting(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -179,112 +201,128 @@ export default function ModuleDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Mark as Complete</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Button
+                  onClick={handleComplete} // ✅ fixed (was handleSubmit)
+                  className="w-full cursor-pointer"
+                  disabled={submitting || complete}
+                >
+                  {completing ? "Completing..." : complete ? "Completed" : "Complete"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
 
       {/* ✅ Recent Submissions - moved BELOW */}
       {/* ✅ Recent Submissions - YouTube style grid with description + points */}
-{moduleData.submissions?.length > 0 && (
-  <div className="p-6">
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">
-          Recent Submissions
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {moduleData.submissions.map((sub, idx) => {
-            let thumbnail = null;
-            try {
-              const parsedThumb = JSON.parse(sub.thumbnail || "{}");
-              thumbnail = parsedThumb?.medium || parsedThumb?.default || null;
-            } catch (e) {
-              thumbnail = null;
-            }
+      {moduleData.submissions?.length > 0 && (
+        <div className="p-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">
+                Recent Submissions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {moduleData.submissions.map((sub, idx) => {
+                  let thumbnail = null;
+                  try {
+                    const parsedThumb = JSON.parse(sub.thumbnail || "{}");
+                    thumbnail = parsedThumb?.medium || parsedThumb?.default || null;
+                  } catch (e) {
+                    thumbnail = null;
+                  }
 
-            return (
-              <div
-                key={idx}
-                className="flex flex-col bg-card rounded-lg shadow-sm hover:shadow-md transition p-2"
-              >
-                {/* Thumbnail */}
-                <a
-                  href={sub.submission}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  {thumbnail ? (
-                    <img
-                      src={thumbnail}
-                      alt={sub.title || "Submission thumbnail"}
-                      className="w-full h-40 object-cover rounded-md"
-                    />
-                  ) : (
-                    <div className="w-full h-40 bg-muted flex items-center justify-center rounded-md text-sm text-muted-foreground">
-                      No Thumbnail
+                  return (
+                    <div
+                      key={idx}
+                      className="flex flex-col bg-card rounded-lg shadow-sm hover:shadow-md transition p-2"
+                    >
+                      {/* Thumbnail */}
+                      <a
+                        href={sub.submission}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        {thumbnail ? (
+                          <img
+                            src={thumbnail}
+                            alt={sub.title || "Submission thumbnail"}
+                            className="w-full h-40 object-cover rounded-md"
+                          />
+                        ) : (
+                          <div className="w-full h-40 bg-muted flex items-center justify-center rounded-md text-sm text-muted-foreground">
+                            No Thumbnail
+                          </div>
+                        )}
+                      </a>
+
+                      {/* Info */}
+                      <div className="mt-2 space-y-1">
+                        {/* Title */}
+                        <a
+                          href={sub.submission}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-sm line-clamp-2 hover:underline"
+                        >
+                          {sub.title || "Untitled Submission"}
+                        </a>
+
+                        {/* Channel + Date */}
+                        <p className="text-xs text-muted-foreground">
+                          {sub.channel_title || "Unknown Channel"} •{" "}
+                          {sub.published_at
+                            ? formatIndianDate(sub.published_at)
+                            : "No date"}
+                        </p>
+
+                        {/* ✅ Description */}
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {sub.description || "No description available"}
+                        </p>
+
+                        {/* ✅ Points */}
+                        <p className="text-xs text-blue-600 font-medium">
+                          🎯 {sub.points_awarded || 0} pts
+                        </p>
+
+                        {/* Status */}
+                        <p
+                          className={`text-xs font-semibold ${sub.status === "accepted"
+                            ? "text-green-600"
+                            : sub.status === "rejected"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                            }`}
+                        >
+                          {sub.status === "accepted"
+                            ? "✅ Accepted"
+                            : sub.status === "rejected"
+                              ? `❌ Rejected ${sub.rejected_reason ? `(${sub.rejected_reason})` : ""
+                              }`
+                              : "⏳ Pending Review"}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </a>
-
-                {/* Info */}
-                <div className="mt-2 space-y-1">
-                  {/* Title */}
-                  <a
-                    href={sub.submission}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-sm line-clamp-2 hover:underline"
-                  >
-                    {sub.title || "Untitled Submission"}
-                  </a>
-
-                  {/* Channel + Date */}
-                  <p className="text-xs text-muted-foreground">
-                    {sub.channel_title || "Unknown Channel"} •{" "}
-                    {sub.published_at
-                      ? formatIndianDate(sub.published_at)
-                      : "No date"}
-                  </p>
-
-                  {/* ✅ Description */}
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {sub.description || "No description available"}
-                  </p>
-
-                  {/* ✅ Points */}
-                  <p className="text-xs text-blue-600 font-medium">
-                    🎯 {sub.points_awarded || 0} pts
-                  </p>
-
-                  {/* Status */}
-                  <p
-                    className={`text-xs font-semibold ${
-                      sub.status === "accepted"
-                        ? "text-green-600"
-                        : sub.status === "rejected"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {sub.status === "accepted"
-                      ? "✅ Accepted"
-                      : sub.status === "rejected"
-                      ? `❌ Rejected ${
-                          sub.rejected_reason ? `(${sub.rejected_reason})` : ""
-                        }`
-                      : "⏳ Pending Review"}
-                  </p>
-                </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </CardContent>
+          </Card>
         </div>
-      </CardContent>
-    </Card>
-  </div>
-)}
+      )}
 
 
       {notification && (
