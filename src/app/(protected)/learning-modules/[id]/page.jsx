@@ -41,6 +41,11 @@ export default function ModuleDetailPage() {
     try {
       const res = await getModuleById(id);
       setModuleData(res.data);
+
+      // ✅ if already completed, set state
+      if (res.data.progress_status === "completed") {
+        setComplete(true);
+      }
     } catch (error) {
       console.error("Error fetching module:", error);
       const backendMessage =
@@ -53,6 +58,7 @@ export default function ModuleDetailPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchModule();
@@ -209,12 +215,17 @@ export default function ModuleDetailPage() {
             <CardContent>
               <div className="space-y-3">
                 <Button
-                  onClick={handleComplete} // ✅ fixed (was handleSubmit)
+                  onClick={handleComplete}
                   className="w-full cursor-pointer"
-                  disabled={submitting || complete}
+                  disabled={completing || complete} 
                 >
-                  {completing ? "Completing..." : complete ? "Completed" : "Complete"}
+                  {completing
+                    ? "Completing..."
+                    : complete
+                      ? "Completed"
+                      : "Complete"}
                 </Button>
+
               </div>
             </CardContent>
           </Card>
